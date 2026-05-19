@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Карта кожи по методу Миловской</title>
+  <!-- ОБЯЗАТЕЛЬНО: SDK Telegram должен быть первым скриптом! -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --gold: #C8A882;
+      --gold-light: #F0E4D0;
+      --dark: #2C2C2C;
+      --text-secondary: #666666;
+      --bg-card: #FFFFFF;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--tg-theme-bg-color, #F8F6F3);
+      color: var(--tg-theme-text-color, var(--dark));
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+      min-height: 100vh;
+    }
+    /* Прогресс-бар */
+    .progress-wrap { height: 4px; background: #E0D8D0; border-radius: 2px; margin-bottom: 20px; }
+    .progress-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.4s ease; }
+
+    /* Карточки */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      margin-bottom: 16px;
+    }
+    .step-label { font-size: 12px; color: #999; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .emoji-icon { font-size: 44px; display: block; margin-bottom: 14px; line-height: 1; }
+    .question-title {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 6px;
+      color: var(--dark);
+    }
+    .question-hint { font-size: 13px; color: #999; margin-bottom: 16px; }
+
+    /* Варианты ответов */
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 14px;
+      border: 2px solid #EBEBEB;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--dark);
+    }
+    .option:active { transform: scale(0.98); }
+    .option.selected {
+      border-color: var(--gold);
+      background: #FDF8F3;
+    }
+    .option-dot {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #CCCCCC;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .option.selected .option-dot {
+      border-color: var(--gold);
+      background: var(--gold);
+    }
+    .option.selected .option-dot::after {
+      content: '';
+      width: 8px; height: 8px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    /* Кнопки */
+    .btn-primary {
+      width: 100%;
+      padding: 15px;
+      background: var(--gold);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary:not(:disabled):active { opacity: 0.85; }
+    .btn-secondary {
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1.5px solid #E0E0E0;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* Экран загрузки */
+    .loading-screen { text-align: center; padding: 60px 20px; }
+    .loading-emoji { font-size: 52px; display: block; margin-bottom: 18px; animation: spin 1.5s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* Экран результата */
+    .result-card {
+      background: linear-gradient(145deg, #FDF8F3, #FFF5EC);
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 28px 22px;
+      margin-bottom: 16px;
+    }
+    .result-center { text-align: center; margin-bottom: 20px; }
+    .result-emoji { font-size: 60px; display: block; margin-bottom: 10px; }
+    .result-title { font-size: 22px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .result-subtitle { font-size: 13px; color: #999; }
+    .result-desc { font-size: 14px; line-height: 1.6; margin-bottom: 18px; color: var(--dark); }
+    .traits-label { font-size: 11px; font-weight: 600; color: #999; letter-spacing: 1px; margin-bottom: 10px; }
+    .trait-item {
+      padding: 9px 0;
+      border-bottom: 1px solid var(--gold-light);
+      font-size: 13px;
+      color: #444;
+      line-height: 1.4;
+    }
+    .recommendation-box {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .rec-label { font-size: 12px; font-weight: 600; color: var(--gold); margin-bottom: 8px; letter-spacing: 0.5px; }
+    .rec-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
+    .warning-box {
+      background: #FFF8E1;
+      border-left: 3px solid #F59E0B;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #92400E;
+      line-height: 1.5;
+    }
+    .disclaimer-box {
+      font-size: 11px;
+      color: #AAAAAA;
+      background: #F5F5F5;
+      padding: 12px 14px;
+      border-radius: 8px;
+      line-height: 1.5;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ============================================================
+// ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP
+// ============================================================
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+const userName = (tg.initDataUnsafe && tg.initDataUnsafe.user)
+  ? tg.initDataUnsafe.user.first_name
+  : '';
+
+// ============================================================
+// ДАННЫЕ КВИЗА — 10 ВОПРОСОВ
+// ============================================================
+const QUESTIONS = [
+  {
+    emoji: "🪞",
+    title: "Как ведёт себя Ваша кожа после умывания?",
+    hint: "Без нанесения средств, первые 10 минут",
+    options: [
+      { text: "Сильно стягивает, ощущение «картонки»", scores: { K1: 3, K5: 1 } },
+      { text: "Немного стягивает, через 20 минут проходит", scores: { K1: 1, K6: 1 } },
+      { text: "Комфортно, никаких ощущений", scores: { K6: 1, K3: 1 } },
+      { text: "Краснеет или появляется жжение", scores: { K4: 3 } },
+      { text: "Отекает, особенно под глазами", scores: { K2: 3 } }
+    ]
+  },
+  {
+    emoji: "☀️",
+    title: "Как реагирует Ваша кожа на солнце?",
+    hint: "Без SPF-защиты",
+    options: [
+      { text: "Загорает равномерно, редко краснею", scores: { K5: 1, K6: 1 } },
+      { text: "Появляются пятна или неровный тон после загара", scores: { K3: 3 } },
+      { text: "Краснею, иногда высыпания", scores: { K4: 3 } },
+      { text: "Кожа сохнет и шелушится", scores: { K1: 2, K5: 1 } },
+      { text: "Отекаю или краснею под солнцем", scores: { K2: 2 } }
+    ]
+  },
+  {
+    emoji: "🌆",
+    title: "Что происходит с кожей к вечеру?",
+    hint: "Через 8–10 часов после утреннего ухода",
+    options: [
+      { text: "Блестит T-зона, остальное в норме", scores: { K6: 3 } },
+      { text: "Лицо выглядит уставшим и отёчным", scores: { K2: 3 } },
+      { text: "Тусклая, обезвоженная, хочется умыться", scores: { K1: 2, K5: 2 } },
+      { text: "Появляются покраснения или дискомфорт", scores: { K4: 2 } },
+      { text: "Пятна и неровности становятся заметнее", scores: { K3: 2 } }
+    ]
+  },
+  {
+    emoji: "🧴",
+    title: "Как кожа реагирует на новые средства?",
+    hint: "Первые 2–3 дня применения",
+    options: [
+      { text: "Краснею, жжёт, иногда высыпает", scores: { K4: 3 } },
+      { text: "Изредка небольшая реакция, потом привыкаю", scores: { K6: 1, K3: 1 } },
+      { text: "Кремы не работают, кожа остаётся сухой", scores: { K1: 2 } },
+      { text: "Нормально, очень редко бывают реакции", scores: { K5: 1, K6: 1 } },
+      { text: "Лицо может отекать от некоторых средств", scores: { K2: 2 } }
+    ]
+  },
+  {
+    emoji: "🔍",
+    title: "Главная проблема Вашей кожи — это...",
+    hint: "Выберите то, что беспокоит больше всего",
+    options: [
+      { text: "Постоянная сухость и стянутость", scores: { K1: 3 } },
+      { text: "Отёки, мешки под глазами, лицо «плывёт»", scores: { K2: 3 } },
+      { text: "Пятна и неровный тон", scores: { K3: 3 } },
+      { text: "Покраснения и чувствительность", scores: { K4: 3 } },
+      { text: "Морщины, потеря упругости и овала", scores: { K5: 3 } },
+      { text: "Жирный блеск и сухость одновременно", scores: { K6: 3 } }
+    ]
+  },
+  {
+    emoji: "🌅",
+    title: "Как выглядит Ваша кожа утром после сна?",
+    hint: "Сразу после пробуждения",
+    options: [
+      { text: "Отёчная, следы от подушки долго не проходят", scores: { K2: 3 } },
+      { text: "Сухая, тусклая, нужно «раскачиваться»", scores: { K1: 2, K5: 1 } },
+      { text: "Пятна утром заметнее, чем вечером", scores: { K3: 2 } },
+      { text: "Покраснения, иногда высыпания", scores: { K4: 2 } },
+      { text: "T-зона блестит, остальное ок", scores: { K6: 2 } },
+      { text: "В целом нормально", scores: { K5: 1, K6: 1 } }
+    ]
+  },
+  {
+    emoji: "🍷",
+    title: "Что чаще всего ухудшает Вашу кожу?",
+    hint: "Один или несколько факторов",
+    options: [
+      { text: "Стресс и усталость", scores: { K1: 2, K4: 1 } },
+      { text: "Солёная еда, алкоголь, мало движения", scores: { K2: 3 } },
+      { text: "Солнце и гормональные изменения", scores: { K3: 3 } },
+      { text: "Холод, ветер, острое, новая косметика", scores: { K4: 3 } },
+      { text: "Возраст — всё медленнее обновляется", scores: { K5: 3 } },
+      { text: "Гормональные перепады, цикл", scores: { K6: 2, K3: 1 } }
+    ]
+  },
+  {
+    emoji: "💦",
+    title: "Как Ваша кожа удерживает увлажнение?",
+    hint: "После нанесения крема или сыворотки",
+    options: [
+      { text: "Плохо, кремы не работают, быстро сохнет", scores: { K1: 3 } },
+      { text: "К вечеру нужно обновить увлажнение", scores: { K6: 1, K5: 1 } },
+      { text: "Нормально, но при этом есть отёки", scores: { K2: 2 } },
+      { text: "Реагирует покраснением на некоторые кремы", scores: { K4: 2 } },
+      { text: "С возрастом держит хуже", scores: { K5: 2 } },
+      { text: "T-зона не нуждается, щёки очень нуждаются", scores: { K6: 3 } }
+    ]
+  },
+  {
+    emoji: "👁️",
+    title: "Что происходит с зоной вокруг глаз?",
+    hint: "Состояние без макияжа",
+    options: [
+      { text: "Мелкие морщинки, сухость, шелушение", scores: { K1: 2, K5: 2 } },
+      { text: "Постоянные мешки и тёмные круги", scores: { K2: 3 } },
+      { text: "Пигментные пятна под глазами", scores: { K3: 2 } },
+      { text: "Отекает и краснеет периодически", scores: { K4: 2 } },
+      { text: "Глубокие морщины, птоз, потеря упругости", scores: { K5: 2 } },
+      { text: "Всё в норме", scores: { K6: 1 } }
+    ]
+  },
+  {
+    emoji: "🔬",
+    title: "Одним словом Ваша кожа — это...",
+    hint: "Самое точное описание",
+    options: [
+      { text: "Истощённая — всегда хочет большего", scores: { K1: 3 } },
+      { text: "Уставшая — особенно лицо «плывёт»", scores: { K2: 3 } },
+      { text: "Пятнистая — тон неровный", scores: { K3: 3 } },
+      { text: "Капризная — всё замечает и реагирует", scores: { K4: 3 } },
+      { text: "Зрелая — хочет другого подхода", scores: { K5: 3 } },
+      { text: "Непредсказуемая — разная в разных зонах", scores: { K6: 3 } }
+    ]
+  }
+];
+
+// ============================================================
+// РЕЗУЛЬТАТЫ ПО АРХЕТИПАМ K1–K6
+// ============================================================
+const ARCHETYPES = {
+  K1: {
+    name: "Истощённая кожа",
+    emoji: "🌿",
+    desc: "Ваша кожа много работала — и устала. Она теряет влагу быстрее, чем успевает восполнить, барьер истончён, и любой внешний раздражитель ощущается острее обычного.",
+    traits: [
+      "Стянутость после умывания, ощущение «картонки»",
+      "«Картонная» кожа в зонах сухости",
+      "Кремы впитываются мгновенно и «не работают»",
+      "Ранние мимические морщины в зонах сухости"
+    ],
+    science: "Снижение уровня церамидов, гиалуроновой кислоты и натурального увлажняющего фактора (NMF). Иногда сигнал о внутренних дефицитах: железо, B-витамины, белок.",
+    recommendation: "Начинаем с барьера — и только потом всё остальное. Деликатный уход без агрессии, без кислот, без пилингов. Сначала — восстановить.",
+    warning: null
+  },
+  K2: {
+    name: "Отёчная кожа",
+    emoji: "💧",
+    desc: "Ваша кожа задерживает воду, токсины, усталость. Утром лицо «плывёт», к обеду немного спадает, но к вечеру снова тяжесть и опухлость.",
+    traits: [
+      "Отёки утром, особенно под глазами и по овалу",
+      "Постоянный «мятый» вид лица после сна",
+      "Ощущение тяжести и сдавленности",
+      "Склонность к пористости и расширенным порам"
+    ],
+    science: "Снижение лимфодренажа, нарушение микроциркуляции. Часто связано с образом жизни: соль, алкоголь, горизонтальное положение во сне, дефицит движения. Иногда — сигнал о нарушении функции почек или гормонального фона.",
+    recommendation: "Работаем с дренажем и микроциркуляцией. Часто причина в образе жизни — и это можно изменить. Ирина подберёт персональный протокол.",
+    warning: null
+  },
+  K3: {
+    name: "Пигментная кожа",
+    emoji: "🌑",
+    desc: "Ваша кожа — это история солнца, воспалений и гормональных изменений, отражённых в неровном тоне. Меланоциты работают активно, часто со сбоями.",
+    traits: [
+      "Пятна после прыщей, ссадин, раздражений",
+      "Гиперпигментация — неровный, «грязный» оттенок",
+      "Мелазма — пятна на фоне гормональных изменений",
+      "Неравномерная реакция на солнце"
+    ],
+    science: "Повышенная реактивность меланоцитов, фотосенсибилизация, иногда гормональный фон (эстрогены, кортизол). Пигментация — это всегда история про триггер.",
+    recommendation: "SPF — это основа, не опция. Дальше — работа с причиной: гормоны, воспаление, осветляющие активы. Всё поэтапно.",
+    warning: null
+  },
+  K4: {
+    name: "Реактивная кожа",
+    emoji: "⚡",
+    desc: "Ваша кожа — чуткий сенсор. Она замечает всё: новый крем, стресс, погоду, еду. И отвечает покраснением, жжением, высыпаниями.",
+    traits: [
+      "Краснеет в ответ на температуру, косметику, эмоции",
+      "Может жечь и зудеть без видимой причины",
+      "Склонность к куперозу или розацеа-подобным реакциям",
+      "Реагирует на алкоголь, острое, горячие напитки"
+    ],
+    science: "Повышенная реактивность нервных окончаний кожи, нейрогенное воспаление, нарушение барьерной функции. Иногда — проявление розацеа или атопии.",
+    recommendation: "Деликатный уход, минимализм, противовоспалительные активы. Сначала — понять причину. Никакого «агрессивного лечения».",
+    warning: "⚠️ Если реакции частые, сильные или сопровождаются длительными покраснениями — это повод для консультации специалиста (розацеа, атопический дерматит). Такие состояния требуют лечения, а не косметологии."
+  },
+  K5: {
+    name: "Возрастная кожа",
+    emoji: "🌸",
+    desc: "Ваша кожа проходит естественный путь зрелости. Она многое пережила — и теперь просит другого подхода: не агрессии, а поддержки и восполнения.",
+    traits: [
+      "Потеря тонуса и чёткости овала",
+      "Углубление морщин, особенно мимических",
+      "Сухость, истончение кожи, снижение упругости",
+      "Замедление клеточного обновления"
+    ],
+    science: "Снижение синтеза коллагена I и III типов, дефицит гиалуронсинтетазы, изменение гормонального фона после 40–45 лет, замедление клеточного обновления.",
+    recommendation: "Инвестируем в качество кожи, а не «затираем» морщины. Работаем с коллагеном, объёмами и ресурсом тела. Результат — от системности.",
+    warning: null
+  },
+  K6: {
+    name: "Комбинированная кожа",
+    emoji: "🎭",
+    desc: "Ваша кожа — это несколько историй одновременно. T-зона живёт своей жизнью, щёки — своей. Или у Вас сочетание нескольких активных проблем.",
+    traits: [
+      "Жирный блеск в T-зоне при сухих щеках",
+      "Высыпания соседствуют с шелушением",
+      "Разные зоны реагируют по-разному на одно средство",
+      "Сложно подобрать «один крем для всего лица»"
+    ],
+    science: "Разная плотность сальных желёз в зонах лица, неодинаковая толщина эпидермиса, сочетание нескольких доминирующих факторов.",
+    recommendation: "Один крем для всего лица — не про Вас. Работаем зонально, системно, с пониманием каждой зоны отдельно.",
+    warning: null
+  }
+};
+
+// ============================================================
+// СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+// ============================================================
+let state = {
+  screen: 'welcome',  // 'welcome' | 'quiz' | 'loading' | 'result' | 'cta'
+  questionIndex: 0,
+  scores: { K1: 0, K2: 0, K3: 0, K4: 0, K5: 0, K6: 0 },
+  answers: [],
+  selectedOption: null,
+  result: null
+};
+
+// ============================================================
+// РЕНДЕР ЭКРАНОВ
+// ============================================================
+function render() {
+  const app = document.getElementById('app');
+  switch (state.screen) {
+    case 'welcome':  app.innerHTML = renderWelcome(); break;
+    case 'quiz':     app.innerHTML = renderQuiz(); break;
+    case 'loading':  app.innerHTML = renderLoading(); break;
+    case 'result':   app.innerHTML = renderResult(); break;
+    case 'cta':      app.innerHTML = renderCTA(); break;
+  }
+  updateBackButton();
+}
+
+function renderWelcome() {
+  const greeting = userName ? `, ${userName}` : '';
+  return `
+    <div style="text-align:center; padding: 16px 0;">
+      <div style="font-size: 64px; margin-bottom: 16px;">🐋</div>
+      <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 10px; line-height: 1.3;">
+        Карта кожи<br>по методу Миловской
+      </h1>
+      <p style="font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 20px;">
+        Добро пожаловать${greeting}!<br>
+        Авторский образовательный квиз доктора Ирины Миловской — врача-дерматолога, косметолога.
+      </p>
+      <div class="disclaimer-box" style="text-align:left; margin-bottom:20px;">
+        🩺 <strong>Важно:</strong> Этот квиз является авторским образовательным инструментом. Результат даёт <em>ориентировочное</em> представление о Вашем типе кожи и <strong>не является медицинским диагнозом</strong>. Для точного определения состояния кожи необходима очная консультация специалиста.
+      </div>
+      <button class="btn-primary" onclick="startQuiz()">Начать квиз →</button>
+      <p style="font-size:12px; color:#999; margin-top:12px;">10 вопросов · около 3 минут</p>
+    </div>
+  `;
+}
+
+function renderQuiz() {
+  const q = QUESTIONS[state.questionIndex];
+  const progress = ((state.questionIndex + 1) / QUESTIONS.length) * 100;
+  const isLast = state.questionIndex === QUESTIONS.length - 1;
+
+  return `
+    <div>
+      <div class="progress-wrap">
+        <div class="progress-fill" style="width: ${progress}%;"></div>
+      </div>
+      <div class="card">
+        <p class="step-label">Шаг ${state.questionIndex + 1} из ${QUESTIONS.length}</p>
+        <span class="emoji-icon">${q.emoji}</span>
+        <h2 class="question-title">${q.title}</h2>
+        ${q.hint ? `<p class="question-hint">${q.hint}</p>` : ''}
+        ${q.options.map((opt, i) => `
+          <div class="option ${state.selectedOption === i ? 'selected' : ''}" onclick="selectOption(${i})">
+            <div class="option-dot"></div>
+            <span>${opt.text}</span>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn-primary" ${state.selectedOption === null ? 'disabled' : ''} onclick="nextQuestion()">
+        ${isLast ? 'Узнать результат 🎯' : 'Далее →'}
+      </button>
+      ${state.questionIndex > 0 ? '<button class="btn-secondary" onclick="prevQuestion()">← Назад</button>' : ''}
+    </div>
+  `;
+}
+
+function renderLoading() {
+  return `
+    <div class="loading-screen">
+      <span class="loading-emoji">🔬</span>
+      <h2 style="font-size: 20px; margin-bottom: 8px;">Анализирую Вашу кожу...</h2>
+      <p style="color: #888; font-size: 14px;">Составляю Вашу карту кожи 🤍</p>
+    </div>
+  `;
+}
+
+function renderResult() {
+  const a = ARCHETYPES[state.result];
+  return `
+    <div>
+      <div class="result-card">
+        <div class="result-center">
+          <span class="result-emoji">${a.emoji}</span>
+          <h2 class="result-title">${a.name}</h2>
+          <p class="result-subtitle">Ваш архетип кожи по методу Миловской</p>
+        </div>
+        <p class="result-desc">${a.desc}</p>
+        <p class="traits-label">ЧТО ХАРАКТЕРНО ДЛЯ ВАШЕЙ КОЖИ:</p>
+        ${a.traits.map(t => `<div class="trait-item">— ${t}</div>`).join('')}
+        ${a.warning ? `<div class="warning-box">${a.warning}</div>` : ''}
+        <div class="recommendation-box">
+          <p class="rec-label">💬 РЕКОМЕНДАЦИЯ ИРИНЫ</p>
+          <p class="rec-text">${a.recommendation}</p>
+        </div>
+        <div class="disclaimer-box">
+          🩺 Данный результат — ориентировочный. Точное определение состояния кожи требует очной консультации специалиста.
+        </div>
+      </div>
+      <button class="btn-primary" onclick="goToCTA()">✍️ Записаться к Ирине</button>
+      <button class="btn-secondary" onclick="resetQuiz()">🔄 Пройти квиз заново</button>
+    </div>
+  `;
+}
+
+function renderCTA() {
+  return `
+    <div style="text-align:center; padding: 16px 0;">
+      <div style="font-size: 60px; margin-bottom: 16px;">👩‍⚕️</div>
+      <h2 style="font-size: 21px; font-weight: 700; margin-bottom: 8px;">Записаться к Ирине</h2>
+      <div class="card" style="text-align:left; margin-bottom:16px;">
+        <p style="font-weight:600; margin-bottom:6px;">Ирина Миловская</p>
+        <p style="font-size:14px; color:#555; line-height:1.7;">
+          Главный врач FGF Medical<br>
+          Врач-дерматолог, косметолог<br>
+          🏥 Санкт-Петербург<br>
+          📅 Чт, Пт, Вс · 10:00–21:00<br>
+          📍 Малый пр. В.О., 64
+        </p>
+      </div>
+      <a href="https://t.me/MilovskayaDR"
+         style="display:block; padding:15px; background:var(--gold); color:#fff;
+                border-radius:12px; text-decoration:none; font-weight:600;
+                font-size:16px; margin-bottom:10px;">
+        ✍️ Написать Ирине лично
+      </a>
+      <a href="https://t.me/fgf_medical"
+         style="display:block; padding:13px; background:#F0F0F0; color:var(--dark);
+                border-radius:12px; text-decoration:none; font-size:14px; margin-bottom:10px;">
+        📞 Написать в клинику FGF Medical
+      </a>
+      <button class="btn-secondary" onclick="state.screen='result'; render();">← Мой результат</button>
+    </div>
+  `;
+}
+
+// ============================================================
+// УПРАВЛЕНИЕ
+// ============================================================
+function startQuiz() {
+  state.screen = 'quiz';
+  render();
+}
+
+function selectOption(index) {
+  state.selectedOption = index;
+  render();
+}
+
+function nextQuestion() {
+  if (state.selectedOption === null) return;
+
+  // Записать очки
+  const opt = QUESTIONS[state.questionIndex].options[state.selectedOption];
+  for (const [key, val] of Object.entries(opt.scores)) {
+    state.scores[key] += val;
+  }
+  state.answers.push(state.selectedOption);
+  state.selectedOption = null;
+
+  if (state.questionIndex < QUESTIONS.length - 1) {
+    state.questionIndex++;
+    render();
+  } else {
+    // Последний вопрос — показать загрузку
+    state.screen = 'loading';
+    render();
+    setTimeout(calculateResult, 2200);
+  }
+}
+
+function prevQuestion() {
+  if (state.questionIndex > 0) {
+    // Отменить очки последнего ответа
+    const lastAnswer = state.answers.pop();
+    if (lastAnswer !== undefined) {
+      const opt = QUESTIONS[state.questionIndex - 1].options[lastAnswer];
+      for (const [key, val] of Object.entries(opt.scores)) {
+        state.scores[key] -= val;
+      }
+    }
+    state.questionIndex--;
+    state.selectedOption = null;
+    render();
+  }
+}
+
+function calculateResult() {
+  let maxScore = 0;
+  let winner = 'K1';
+  for (const [key, val] of Object.entries(state.scores)) {
+    if (val > maxScore) { maxScore = val; winner = key; }
+  }
+  state.result = winner;
+  state.screen = 'result';
+
+  // Отправить результат в бота
+  try {
+    const data = JSON.stringify({
+      archetype: winner,
+      archetype_name: ARCHETYPES[winner].name,
+      scores: state.scores,
+      quiz_completed: true
+    });
+    tg.sendData(data);
+  } catch (e) {
+    console.log('sendData not available (not in keyboard button context):', e);
+  }
+
+  render();
+}
+
+function goToCTA() {
+  state.screen = 'cta';
+  render();
+}
+
+function resetQuiz() {
+  state = {
+    screen: 'welcome',
+    questionIndex: 0,
+    scores: { K1: 0, K2: 0, K3: 0, K4: 0, K5: 0, K6: 0 },
+    answers: [],
+    selectedOption: null,
+    result: null
+  };
+  render();
+}
+
+// ============================================================
+// КНОПКА «НАЗАД» TELEGRAM
+// ============================================================
+function updateBackButton() {
+  if (state.screen === 'welcome') {
+    tg.BackButton.hide();
+  } else {
+    tg.BackButton.show();
+    tg.BackButton.onClick(() => {
+      if (state.screen === 'quiz' && state.questionIndex > 0) {
+        prevQuestion();
+      } else if (state.screen === 'quiz' && state.questionIndex === 0) {
+        state.screen = 'welcome'; render();
+      } else if (state.screen === 'result') {
+        state.screen = 'quiz'; render();
+      } else if (state.screen === 'cta') {
+        state.screen = 'result'; render();
+      } else {
+        tg.close();
+      }
+    });
+  }
+}
+
+// Первый рендер
+render();
+</script>
+</body>
+</html>
