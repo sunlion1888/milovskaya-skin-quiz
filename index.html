@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Карта кожи по методу Миловской</title>
+<title>Карта кожи | Ирина Миловская</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,263 +15,134 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
-  --gold: #C8A882; --gold-h: #B8966E;
-  --gold-light: #FAF6F0;
-  --black: #111111; --gray: #6B6B6B;
-  --gray-light: #F9F9F9; --border: #EAEAEA;
+  --gold: #C8A882; --gold-h: #B8966E; --gold-light: #FAF6F0;
+  --black: #111111; --gray: #6B6B6B; --gray-light: #F9F9F9; --border: #EAEAEA;
   --white: #FFFFFF; --r: 20px; --r-sm: 14px;
   --sb: env(safe-area-inset-bottom, 0px);
   --st: env(safe-area-inset-top, 0px);
 
   --p-screen: min(20px, 3vh);
   --p-card: min(18px, 2.5vh);
-  --p-opt: min(13px, 2vh);
+  --p-opt: min(14px, 2vh);
   --gap-quiz: min(8px, 1.5vh);
   --title-quiz: clamp(18px, 4vh, 22px);
 }
 html, body { height: 100%; background: #FFFFFF !important; overflow: hidden; }
-body {
-  color: var(--black) !important;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-#app {
-  display: flex; flex-direction: column;
-  height: 100dvh;
-  background: #FFFFFF; max-width: 480px; margin: 0 auto; overflow: hidden;
-}
-.top-bar {
-  flex-shrink: 0; padding: 12px var(--p-screen) 6px;
-  padding-top: max(12px, var(--st));
-  background: #FFFFFF; display: flex; align-items: center; gap: 10px;
-}
-.pb-outer { flex: 1; height: 5px; background: var(--gray-light); border-radius: 3px; overflow: hidden; }
-.pb-inner { height: 100%; background: var(--gold); border-radius: 3px; transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+body { color: var(--black) !important; font-family: 'Inter', -apple-system, sans-serif; }
+#app { display: flex; flex-direction: column; height: 100dvh; background: #FFFFFF; max-width: 480px; margin: 0 auto; overflow: hidden; }
+
+.top-bar { flex-shrink: 0; padding: 12px var(--p-screen) 6px; padding-top: max(12px, var(--st)); background: #FFFFFF; display: flex; align-items: center; gap: 10px; }
+.pb-outer { flex: 1; height: 4px; background: var(--gray-light); border-radius: 2px; overflow: hidden; }
+.pb-inner { height: 100%; background: var(--black); border-radius: 2px; transition: width 0.4s ease; }
 .step-txt { font-size: 11px; font-weight: 600; color: var(--gray); white-space: nowrap; min-width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
 
-.content {
-  flex: 1 1 0; overflow-y: auto; overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  padding: 0 var(--p-screen);
-  animation: fadeSlideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
+.content { flex: 1 1 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 0 var(--p-screen); animation: fadeSlideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
 .content::-webkit-scrollbar { display: none; }
+.quiz-content { display: flex; flex-direction: column; height: 100%; justify-content: flex-start; padding-bottom: 20px; }
 
-.quiz-content {
-  display: flex; flex-direction: column;
-  height: 100%; justify-content: flex-start;
-  padding-bottom: 20px;
-}
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.bottom {
-  flex-shrink: 0; padding: 12px var(--p-screen);
-  padding-bottom: calc(12px + var(--sb));
-  background: #FFFFFF; border-top: 1px solid var(--border);
-  display: flex; flex-direction: column; gap: 8px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.02);
-}
-.btn {
-  width: 100%; padding: 14px 20px; border: none; border-radius: var(--r-sm);
-  font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 600;
-  cursor: pointer; text-align: center; text-decoration: none; display: block;
-  transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94); letter-spacing: 0.1px;
-}
+.bottom { flex-shrink: 0; padding: 12px var(--p-screen); padding-bottom: calc(12px + var(--sb)); background: #FFFFFF; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.02); }
+.btn { width: 100%; padding: 14px 20px; border: none; border-radius: var(--r-sm); font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; display: block; transition: all 0.15s ease; letter-spacing: 0.1px; }
 .btn:active:not(:disabled) { opacity: 0.85; transform: scale(0.98); }
 .btn-black { background: var(--black); color: #fff; }
-.btn-gold  { background: var(--gold);  color: #fff; box-shadow: 0 4px 15px rgba(200, 168, 130, 0.3); }
+.btn-gold { background: var(--gold); color: #fff; box-shadow: 0 4px 15px rgba(200, 168, 130, 0.3); }
 .btn-outline { background: transparent; color: var(--gray); border: 1.5px solid var(--border); font-weight: 500; }
 .btn-outline-dark { background: transparent; color: var(--black); border: 1.5px solid var(--black); font-weight: 600; }
 .btn:disabled { background: #E0E0E0; color: #A0A0A0; cursor: not-allowed; transform: none !important; opacity: 1 !important; }
 
-.welcome-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: min(30px, 6vh); font-weight: 600; line-height: 1.1; color: var(--black); text-align: center; margin-bottom: 8px; }
-.ns-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(24px, 5vh, 28px); font-weight: 600; text-align: center; color: var(--black); margin-bottom: 8px; line-height: 1.2; }
-.q-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: var(--title-quiz); font-weight: 600; line-height: 1.2; color: var(--black); margin-bottom: 4px; }
-.consent-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(24px, 5vh, 28px); font-weight: 600; text-align: center; color: var(--black); margin-bottom: 8px; }
-.res-name { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(28px, 6vh, 34px); font-weight: 600; color: var(--black); margin-bottom: 8px; line-height: 1.1; }
-.doc-name { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; font-weight: 600; color: var(--black); margin-bottom: 4px; }
+/* ТИПОГРАФИКА */
+.cormorant { font-family: 'Cormorant Garamond', Georgia, serif; }
+.welcome-title { font-size: min(30px, 6vh); font-weight: 600; line-height: 1.1; color: var(--black); text-align: center; margin-bottom: 8px; }
+.ns-title { font-size: clamp(24px, 5vh, 28px); font-weight: 600; text-align: center; color: var(--black); margin-bottom: 8px; line-height: 1.2; }
+.q-title { font-size: var(--title-quiz); font-weight: 600; line-height: 1.2; color: var(--black); margin-bottom: 4px; }
 
 /* WELCOME SCREEN */
 .logo-wrap { text-align: center; padding: 24px 0 16px; flex-shrink: 1; min-height: 0;}
-.logo-img { width: clamp(80px, 15vh, 110px); height: clamp(80px, 15vh, 110px); object-fit: contain; display: block; margin: 0 auto; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
-.welcome-by { font-size: 13px; color: var(--gray); text-align: center; line-height: 1.5; margin-bottom: 20px; }
+.logo-img { width: clamp(80px, 15vh, 110px); height: clamp(80px, 15vh, 110px); object-fit: contain; display: block; margin: 0 auto; border-radius: 50%; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.welcome-by { font-size: 14px; color: var(--gray); text-align: center; line-height: 1.5; margin-bottom: 24px; }
+.method-note { font-size: 10px; color: #999; text-align: center; line-height: 1.4; margin-bottom: 20px; padding: 0 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 20px; }
 .stat-item { text-align: center; }
 .stat-num { font-size: 22px; font-weight: 700; color: var(--black); letter-spacing: -0.5px; }
 .stat-lbl { font-size: 10px; color: var(--gray); margin-top: 2px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-.divider { height: 1px; background: var(--border); margin: 0 0 16px; }
-.notice { background: var(--gray-light); border-radius: var(--r-sm); border-left: 3px solid var(--gold); padding: 12px 14px; font-size: 12.5px; color: #444; line-height: 1.5; margin-bottom: 16px; }
-.welcome-subtext { font-size: 10px; color: #A5A5A5; text-align: center; line-height: 1.5; margin-top: 4px; }
-.welcome-subtext span { color: var(--gold-h); font-weight: 500; cursor: pointer; text-decoration: underline; }
 
-/* NAME SCREEN & AGE */
+/* PREP SCREEN */
+.prep-icon { font-size: 48px; display: block; text-align: center; margin-bottom: 16px; margin-top: 20px; }
+.prep-list { background: var(--gray-light); border-radius: var(--r); padding: 20px; margin-top: 24px; border: 1px solid var(--border); }
+.prep-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.prep-item:last-child { margin-bottom: 0; }
+.prep-num { width: 24px; height: 24px; background: var(--black); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.prep-txt { font-size: 14px; color: var(--black); line-height: 1.5; }
+
+/* INPUTS */
 .name-screen { padding-top: 16px; }
-.ns-sub { font-size: 13.5px; color: var(--gray); text-align: center; margin-bottom: 24px; line-height: 1.5; }
-.input-field {
-  width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
-  border-radius: var(--r-sm); font-family: 'Inter', sans-serif;
-  font-size: 15px; color: var(--black); background: var(--white);
-  outline: none; transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.01);
-  -webkit-appearance: none;
-}
-.input-field:focus { border-color: var(--gold); box-shadow: 0 4px 12px rgba(200, 168, 130, 0.1); }
+.ns-sub { font-size: 14px; color: var(--gray); text-align: center; margin-bottom: 24px; line-height: 1.5; }
+.input-field { width: 100%; padding: 16px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: 'Inter', sans-serif; font-size: 15px; color: var(--black); outline: none; transition: all 0.2s ease; -webkit-appearance: none; box-shadow: 0 2px 4px rgba(0,0,0,0.01); }
+.input-field:focus { border-color: var(--black); }
 .input-field::placeholder { color: #CCCCCC; }
 .input-label { font-size: 10px; font-weight: 700; color: var(--gray); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px; display: block; }
-.err-hint { font-size: 12.5px; color: #CC3333; margin-top: 8px; display: none; font-weight: 500; }
+.err-hint { font-size: 12px; color: #CC3333; margin-top: 8px; display: none; font-weight: 500; }
 .err-hint.show { display: block; }
 
-/* AGE & OPTIONS */
-.age-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-.age-opt {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px; border: 1px solid rgba(0,0,0,0.03);
-  border-radius: var(--r-sm); cursor: pointer;
-  background: var(--white); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s cubic-bezier(0.215, 0.610, 0.355, 1);
-  font-size: 14px; font-weight: 500; color: var(--black);
-}
-.age-opt:active { transform: scale(0.99); }
-.age-opt.sel { border-color: var(--gold); background: var(--gold-light); }
-.age-radio {
-  width: 22px; height: 22px; border: 2px solid #D0D0D0;
-  border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s ease; background: var(--white);
-}
-.age-opt.sel .age-radio { border-color: var(--gold); background: var(--gold); }
-.age-opt.sel .age-radio::after { content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
-
-/* QUIZ CARD & OPTIONS */
+/* QUIZ OPTIONS */
 .q-card { background: var(--white); border: 1px solid rgba(0,0,0,0.02); box-shadow: 0 5px 20px rgba(0,0,0,0.02); border-radius: var(--r); padding: var(--p-card) var(--p-card) calc(var(--p-card) * 0.8); margin-bottom: var(--gap-quiz); margin-top: 8px; flex-shrink: 0; }
 .q-hint { font-size: 12.5px; color: var(--gray); line-height: 1.5; }
-.opts { display: flex; flex-direction: column; gap: var(--gap-quiz); flex-grow: 1; overflow: hidden; justify-content: flex-start; }
-.opt {
-  display: flex; align-items: center; gap: 12px; padding: var(--p-opt) 18px;
-  border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 3px 10px rgba(0,0,0,0.02); border-radius: var(--r-sm);
-  cursor: pointer; font-size: 13.5px; color: var(--black); line-height: 1.4;
-  background: var(--white); transition: all 0.15s cubic-bezier(0.215, 0.610, 0.355, 1); font-weight: 400;
-  flex-grow: 1;
-}
+.opts { display: flex; flex-direction: column; gap: var(--gap-quiz); flex-grow: 1; overflow-y: auto; justify-content: flex-start; padding-bottom: 10px; }
+.opt { display: flex; align-items: center; gap: 12px; padding: var(--p-opt) 18px; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 3px 10px rgba(0,0,0,0.02); border-radius: var(--r-sm); cursor: pointer; font-size: 13.5px; color: var(--black); line-height: 1.4; background: var(--white); transition: all 0.15s ease; font-weight: 500; flex-shrink: 0; }
 .opt:active { transform: scale(0.99); }
-.opt.sel { border-color: var(--gold); background: var(--gold-light); }
-.opt-dot {
-  width: 20px; height: 20px; border: 2px solid #D0D0D0; border-radius: 50%;
-  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s ease; background: var(--white);
-}
-.opt.sel .opt-dot { border-color: var(--gold); background: var(--gold); }
+.opt.sel { border-color: var(--black); background: var(--gray-light); }
+.opt-dot { width: 20px; height: 20px; border: 2px solid #D0D0D0; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; background: var(--white); }
+.opt.sel .opt-dot { border-color: var(--black); background: var(--black); }
 .opt.sel .opt-dot::after { content: ''; width: 7px; height: 7px; background: white; border-radius: 50%; }
 
-/* CONSENT SCREEN */
+/* CONSENT */
 .consent-screen { padding-top: 16px; }
-.consent-sub { font-size: 13.5px; color: var(--gray); text-align: center; margin-bottom: 24px; line-height: 1.5; }
-.consent-row {
-  display: flex; align-items: flex-start; gap: 16px;
-  padding: 20px; background: var(--white);
-  border-radius: var(--r);
-  border: 1.5px solid #F5F0EA;
-  cursor: pointer; transition: all 0.2s cubic-bezier(0.215, 0.610, 0.355, 1);
-  user-select: none; margin-bottom: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-}
-.consent-row.active { border-color: var(--gold); background-color: var(--gold-light); box-shadow: 0 8px 30px rgba(200, 168, 130, 0.1); }
-.check-box {
-  width: 24px; height: 24px; border: 2px solid #D8D0C5; border-radius: 8px;
-  flex-shrink: 0; margin-top: 1px; background: var(--white);
-  display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
-}
-.consent-row.active .check-box { background: var(--gold); border-color: var(--gold); }
+.consent-row { display: flex; align-items: flex-start; gap: 14px; padding: 20px; background: var(--white); border-radius: var(--r); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s ease; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+.consent-row.active { border-color: var(--black); background-color: var(--gray-light); }
+.check-box { width: 24px; height: 24px; border: 2px solid #D0D0D0; border-radius: 6px; flex-shrink: 0; margin-top: 1px; background: var(--white); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.consent-row.active .check-box { background: var(--black); border-color: var(--black); }
 .check-mark { color: white; font-size: 13px; font-weight: 700; display: none; }
 .consent-row.active .check-mark { display: block; }
 .consent-txt { font-size: 13.5px; color: var(--black); line-height: 1.6; }
-.consent-link { color: var(--gold-h); text-decoration: underline; cursor: pointer; font-weight: 500; }
-.consent-brief-box { background: var(--gray-light); border-radius: var(--r-sm); padding: 14px 16px; font-size: 12px; color: #555; line-height: 1.6; margin-top: 12px; border: 1px solid var(--border); }
+.consent-link { color: var(--gray); text-decoration: underline; cursor: pointer; }
 
-/* LOADING SCREEN (UPDATED LOGO ANIMATION) */
-.loading-full {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; background: #FFFFFF; text-align: center; padding: 30px;
-}
-.loading-logo {
-  width: 100px; height: 100px;
-  object-fit: contain; margin-bottom: 32px;
-  animation: premiumPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-@keyframes premiumPulse {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.8; }
-}
-.loading-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; font-weight: 600; color: var(--black); margin-bottom: 10px; }
-.loading-sub { font-size: 14.5px; color: var(--gray); }
+/* LOADING */
+.loading-full { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #FFFFFF; text-align: center; padding: 30px; }
+.loading-logo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 24px; animation: premiumPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+@keyframes premiumPulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
+.loading-title { font-size: 22px; font-weight: 600; color: var(--black); margin-bottom: 10px; }
 
-/* RESULT SCREEN */
-.result-top { text-align: center; padding: 32px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-.res-emoji { font-size: 56px; display: block; margin-bottom: 12px; }
-.res-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold-h); background: var(--gold-light); padding: 5px 14px; border-radius: 20px; margin-bottom: 12px; }
-.res-desc { font-size: 15px; color: #444; line-height: 1.7; }
-.section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-bottom: 12px; margin-top: 12px; }
-.trait-list { margin-bottom: 20px; }
-.trait-line { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--gray-light); font-size: 13.5px; color: var(--black); line-height: 1.55; }
-.trait-line:last-child { border-bottom: none; }
-.tdot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; margin-top: 8px; flex-shrink: 0; }
-.rec-box { background: var(--gold-light); border: 1px solid rgba(200, 168, 130, 0.15); border-radius: var(--r); padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 15px rgba(200, 168, 130, 0.05); }
-.rec-head { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold-h); margin-bottom: 10px; }
-.rec-body { font-size: 14.5px; color: var(--black); line-height: 1.7; }
-.warn-box { background: #FFF9EE; border-radius: var(--r-sm); padding: 14px 18px; font-size: 14px; color: #7C4F00; line-height: 1.6; margin-bottom: 16px; border-left: 4px solid var(--gold); }
-.fine-print { font-size: 11.5px; color: #AAAAAA; text-align: center; line-height: 1.6; padding-bottom: 6px; }
+/* RESULTS (360 DEGREES) */
+.result-top { text-align: center; padding: 24px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.res-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+.res-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); background: var(--gray-light); padding: 5px 12px; border-radius: 20px; margin-bottom: 12px; }
+.res-name { font-size: 28px; font-weight: 600; color: var(--black); margin-bottom: 12px; line-height: 1.1; }
+.res-desc { font-size: 14.5px; color: #444; line-height: 1.6; }
 
-.proc-section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-bottom: 12px; margin-top: 8px; }
-.proc-tag { display: inline-block; background: var(--white); border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.01); border-radius: 24px; padding: 7px 16px; font-size: 13.5px; font-weight: 500; color: var(--black); margin: 4px 6px 6px 0; cursor: pointer; transition: all 0.2s ease; }
-.proc-tag:active { background: var(--black); color: #fff; border-color: var(--black); transform: scale(0.96); }
+.r-section { margin-bottom: 24px; }
+.r-title { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--black); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.r-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 12px; }
+.r-ul { list-style: none; padding: 0; margin: 0; }
+.r-li { position: relative; padding-left: 16px; margin-bottom: 8px; font-size: 13.5px; line-height: 1.5; color: var(--black); }
+.r-li::before { content: '•'; position: absolute; left: 0; color: var(--gray); font-size: 16px; line-height: 1; top: 1px; }
+.r-li:last-child { margin-bottom: 0; }
 
-/* CTA SECTION */
-.doctor-section { text-align: center; padding-top: 24px; }
-.doc-avatar { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; display: block; margin: 0 auto 16px; box-shadow: 0 8px 24px rgba(200, 168, 130, 0.2); }
-.doc-avatar-ph { width: 110px; height: 110px; border-radius: 50%; background: var(--gray-light); border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 56px; margin: 0 auto 16px; }
-.doc-pos { font-size: 13.5px; color: var(--gray); margin-bottom: 24px; line-height: 1.6; }
-.info-card { background: var(--white); border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 6px 24px rgba(0,0,0,0.02); border-radius: var(--r-sm); overflow: hidden; margin-bottom: 16px; }
-.info-line { display: flex; align-items: center; gap: 14px; padding: 13px 16px; font-size: 13.5px; color: var(--black); border-bottom: 1px solid #F5F5F5; text-align: left; }
-.info-line:last-child { border-bottom: none; }
-.info-ic { font-size: 20px; flex-shrink: 0; }
+.nutri-tag { display: inline-block; background: var(--gray-light); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; margin: 0 4px 6px 0; border: 1px solid var(--border); }
+.fine-print { font-size: 11px; color: #AAAAAA; text-align: center; line-height: 1.5; margin-top: 10px; }
 
-/* НАТИВНОЕ МОДАЛЬНОЕ ОКНО */
-.modal-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.4); z-index: 2000;
-  display: none; align-items: flex-end; justify-content: center;
-}
+/* MODAL */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
 .modal-overlay.show { display: flex; }
-.modal-window {
-  width: 100%; max-width: 480px; background: #FFFFFF;
-  border-top-left-radius: var(--r); border-top-right-radius: var(--r);
-  max-height: 90dvh; display: flex; flex-direction: column;
-  animation: slideTop 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-  padding-bottom: calc(10px + var(--sb));
-}
+.modal-window { width: 100%; max-width: 480px; background: #FFFFFF; border-top-left-radius: var(--r); border-top-right-radius: var(--r); max-height: 90dvh; display: flex; flex-direction: column; animation: slideTop 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards; padding-bottom: calc(10px + var(--sb)); }
 @keyframes slideTop { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-header {
-  padding: 20px 24px 14px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-}
+.modal-header { padding: 20px 24px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .modal-title { font-size: 16px; font-weight: 700; color: var(--black); }
-.modal-close {
-  background: var(--gray-light); border: none; width: 30px; height: 30px;
-  border-radius: 50%; font-size: 16px; font-weight: 600; color: var(--gray);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-}
-.modal-body {
-  flex: 1; overflow-y: auto; padding: 16px 20px;
-  font-size: 13px; color: #333333; line-height: 1.65;
-  -webkit-overflow-scrolling: touch;
-}
+.modal-close { background: var(--gray-light); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: 600; color: var(--gray); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; font-size: 13px; color: #333333; line-height: 1.65; }
 .modal-body b { color: var(--black); display: block; margin-top: 14px; margin-bottom: 4px; }
 .modal-body b:first-child { margin-top: 0; }
+
 </style>
 </head>
 <body>
@@ -281,10 +152,19 @@ body {
 <div id="policyModal" class="modal-overlay" onclick="closePolicyModal()">
   <div class="modal-window" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <div class="modal-title">Правовые документы</div>
+      <div class="modal-title">Правовая информация</div>
       <button class="modal-close" onclick="closePolicyModal()">✕</button>
     </div>
-    <div class="modal-body" id="modalBodyContent"></div>
+    <div class="modal-body" id="modalBodyContent">
+      <b>1. Общие положения</b><br>
+      Политика обработки данных разработана для модуля «Карта кожи».<br><br>
+      <b>2. Собираемые данные</b><br>
+      В рамках теста обрабатываются: ваше имя, Telegram ID и ответы на вопросы для подбора рекомендаций.<br><br>
+      <b>3. Конфиденциальность</b><br>
+      Ваши данные используются исключительно для формирования медицинского протокола и не передаются третьим лицам.<br><br>
+      <b>4. Отзыв согласия</b><br>
+      Вы можете в любой момент отозвать согласие, написав в службу поддержки клиники.
+    </div>
   </div>
 </div>
 
@@ -302,209 +182,257 @@ function triggerHaptic(type = 'light') {
     if (tg.HapticFeedback) {
       if (type === 'light') tg.HapticFeedback.impactOccurred('light');
       else if (type === 'medium') tg.HapticFeedback.impactOccurred('medium');
-      else if (type === 'heavy') tg.HapticFeedback.impactOccurred('heavy');
       else if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
-      else if (type === 'warning') tg.HapticFeedback.notificationOccurred('warning');
     }
   } catch(e) {}
 }
 
-const LOGO_URL   = 'https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/logo.png';
 const PHOTO_URL  = 'https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/photo.jpg';
-const BOT_USERNAME = 'AssistentMilovskayaBot';
 
-const AGE_GROUPS = [
-  { label: '18–25 лет', value: '18-25' },
-  { label: '26–35 лет', value: '26-35' },
-  { label: '36–45 лет', value: '36-45' },
-  { label: '46–55 лет', value: '46-55' },
-  { label: '56 лет и старше', value: '56+' },
-];
-
-const PROC_BY_ARCH = {
-  K1: { label: 'для истощённой кожи', items: [ { name: 'Биоревитализация', cmd: 'proc_biorev' }, { name: 'Плазмотерапия PRP', cmd: 'proc_prp' }, { name: 'Мезотерапия (питание)', cmd: 'proc_meso' }, { name: 'Barrier Recovery уход', cmd: 'proc_care' } ] },
-  K2: { label: 'для отёчной кожи', items: [ { name: 'Icoone (лимфодренаж)', cmd: 'proc_icoone' }, { name: 'Микроигольчатый RF', cmd: 'proc_rf' }, { name: 'Биоревитализация', cmd: 'proc_biorev' }, { name: 'Дренажный массаж лица', cmd: 'proc_massage' } ] },
-  K3: { label: 'для пигментной кожи', items: [ { name: 'Лазерное удаление пигмента', cmd: 'proc_laser' }, { name: 'Медицинский пилинг', cmd: 'proc_peeling' }, { name: 'Мезотерапия (осветление)', cmd: 'proc_meso' }, { name: 'Профессиональный SPF уход', cmd: 'proc_spf' } ] },
-  K4: { label: 'для реактивной кожи', items: [ { name: 'Плазмотерапия PRP', cmd: 'proc_prp' }, { name: 'Деликатная биоревитализация', cmd: 'proc_biorev' }, { name: 'Фотодинамическая LED терапия', cmd: 'proc_led' }, { name: 'Противовоспалительный уход', cmd: 'proc_care' } ] },
-  K5: { label: 'для возрастной кожи', items: [ { name: 'Коллагеностимуляция Ultracol', cmd: 'proc_threads' }, { name: 'Контурная пластика', cmd: 'proc_filler' }, { name: 'Ботулинотерапия', cmd: 'proc_botox' }, { name: 'Термолифтинг RF', cmd: 'proc_rf' } ] },
-  K6: { label: 'для комбинированной кожи', items: [ { name: 'Зональная мезотерапия', cmd: 'proc_meso' }, { name: 'Регулирующий пилинг', cmd: 'proc_peeling' }, { name: 'Глубокое биоувлажнение', cmd: 'proc_biorev' }, { name: 'Индивидуальный уход', cmd: 'proc_care' } ] }
-};
-
+// НОВАЯ МЕТОДОЛОГИЯ БАУМАННА (12 вопросов)
 const Q = [
-  { title: "Как ведёт себя Ваша кожа после умывания?", hint: "Без нанесения средств, первые 10 минут", opts:[{t:"Сильно стягивает, ощущение «картонки»",s:{K1:3,K5:1}},{t:"Немного стягивает, через 20 минут проходит",s:{K1:1,K6:1}},{t:"Комфортно, никаких ощущений",s:{K6:1,K3:1}},{t:"Краснеет или появляется жжение",s:{K4:3}},{t:"Отекает, особенно под глазами",s:{K2:3}}]},
-  { title: "Как реагирует Ваша кожа на солнце?", hint: "Без SPF-защиты", opts:[{t:"Загорает равномерно, редко краснею",s:{K5:1,K6:1}},{t:"Появляются пятна или неровный тон после загара",s:{K3:3}},{t:"Краснею, иногда высыпания",s:{K4:3}},{t:"Кожа сохнет и шелушится",s:{K1:2,K5:1}},{t:"Отекаю или краснею под солнцем",s:{K2:2}}]},
-  { title: "Что происходит с кожей к вечеру?", hint: "Через 8–10 часов после утреннего ухода", opts:[{t:"Блестит T-зона, остальное в норме",s:{K6:3}},{t:"Лицо выглядит уставшим и отёчным",s:{K2:3}},{t:"Тусклая, обезвоженная, хочется умыться",s:{K1:2,K5:2}},{t:"Появляются покраснения или дискомфорт",s:{K4:2}},{t:"Пятна и неровности становятся заметнее",s:{K3:2}}]},
-  { title: "Как кожа реагирует на новые средства?", hint: "Первые 2–3 дня применения", opts:[{t:"Краснею, жжёт, иногда высыпает",s:{K4:3}},{t:"Изредка небольшая реакция, потом привыкаю",s:{K6:1,K3:1}},{t:"Кремы не работают, кожа остаётся сухой",s:{K1:2}},{t:"Нормально, очень редко бывают реакции",s:{K5:1,K6:1}},{t:"Лицо может отекать от некоторых средств",s:{K2:2}}]},
-  { title: "Главная проблема Вашей кожи — это...", hint: "Выберите то, что беспокоит больше всего", opts:[{t:"Постоянная сухость и стянутость",s:{K1:3}},{t:"Отёки, мешки под глазами, лицо «плывёт»",s:{K2:3}},{t:"Пятна и неровный тон",s:{K3:3}},{t:"Покраснения и чувствительность",s:{K4:3}},{t:"Морщины, потеря упругости и овала",s:{K5:3}},{t:"Жирный блеск и сухость одновременно",s:{K6:3}}]},
-  { title: "Как выглядит Ваша кожа утром после сна?", hint: "Сразу после пробуждения", opts:[{t:"Отёчная, следы от подушки долго не проходят",s:{K2:3}},{t:"Сухая, тусклая, нужно «раскачиваться»",s:{K1:2,K5:1}},{t:"Пятна утром заметнее, чем вечером",s:{K3:2}},{t:"Покраснения, иногда высыпания",s:{K4:2}},{t:"T-зона блестит, остальное ок",s:{K6:2}},{t:"В целом нормально",s:{K5:1,K6:1}}]},
-  { title: "Что чаще всего ухудшает Вашу кожу?", hint: "Один или несколько факторов", opts:[{t:"Стресс и усталость",s:{K1:2,K4:1}},{t:"Солёная еда, алкоголь, мало движения",s:{K2:3}},{t:"Солнце и гормональные изменения",s:{K3:3}},{t:"Холод, ветер, острое, новая косметика",s:{K4:3}},{t:"Возраст — всё медленнее обновляется",s:{K5:3}},{t:"Гормональные перепады, цикл",s:{K6:2,K3:1}}]},
-  { title: "Как Ваша кожа удерживает увлажнение?", hint: "После нанесения крем или сыворотки", opts:[{t:"Плохо, кремы не работают, быстро сохнет",s:{K1:3}},{t:"К вечеру нужно обновить увлажнение",s:{K6:1,K5:1}},{t:"Нормально, но при этом есть отёки",s:{K2:2}},{t:"Реагирует покраснением на некоторые кремы",s:{K4:2}},{t:"С возрастастом держит хуже",s:{K5:2}},{t:"T-зона не нуждается, щёки очень нуждаются",s:{K6:3}}]},
-  { title: "Что происходит с зоной вокруг глаз?", hint: "Состояние без макияжа", opts:[{t:"Мелкие морщинки, сухость, шелушение",s:{K1:2,K5:2}},{t:"Постоянные мешки и тёмные круги",s:{K2:3}},{t:"Пигментные пятна под глазами",s:{K3:2}},{t:"Отекает и краснеет периодически",s:{K4:2}},{t:"Глубокие морщины, птоз, потеря упругости",s:{K5:2}},{t:"Всё в норме",s:{K6:1}}]},
-  { title: "Одним словом Ваша кожа — это...", hint: "Самое точное описание", opts:[{t:"Истощённая — всегда хочет большего",s:{K1:3}},{t:"Уставшая — особенно лицо «плывёт»",s:{K2:3}},{t:"Пятнистая — тон неровный",s:{K3:3}},{t:"Капризная — всё замечает и реагирует",s:{K4:3}},{t:"Зрелая — хочет другого подхода",s:{K5:3}},{t:"Непредсказуемая — разная в разных зонах",s:{K6:3}}]}
+  { title: "Как выглядит ваша кожа утром, когда вы просыпаетесь?", hint: "Сразу после пробуждения",
+    opts:[
+      {t:"Матовая, комфортная, без блеска", s:{T5:2, T2:1}},
+      {t:"Слегка блестит в Т-зоне (нос, лоб)", s:{T1:1, T5:1}},
+      {t:"Сильно блестит по всему лицу", s:{T1:3}},
+      {t:"Ощущается стянутой и сухой", s:{T2:3, T4:1}}
+    ]},
+  { title: "Что происходит через 30 минут после умывания без крема?", hint: "Оценка гидролипидной мантии",
+    opts:[
+      {t:"Ощущение сильной стянутости, хочется нанести крем", s:{T2:3, T4:1}},
+      {t:"Комфортно, стянутости нет", s:{T5:2}},
+      {t:"Кожа начинает жирниться и блестеть", s:{T1:3}},
+      {t:"Появляются покраснения или дискомфорт", s:{T4:2, T2:1}} // Реактивная (T4 в нашей старой, но здесь T2/T4) 
+      // Корректировка: T1(Жирн), T2(Сух/Чувств), T3(Пигмент), T4(Возраст), T5(Норма)
+      // Красные пятна -> T2 (Чувствительная)
+    ]},
+  { title: "Как выглядят ваши поры?", hint: "В зеркале при дневном свете",
+    opts:[
+      {t:"Практически незаметны", s:{T2:1, T5:1}},
+      {t:"Расширенные только в Т-зоне", s:{T1:1, T5:1}},
+      {t:"Расширенные по всему лицу", s:{T1:2}},
+      {t:"Крупные поры, склонные к черным точкам", s:{T1:3}}
+    ]},
+  { title: "Как часто у вас появляются прыщи или воспаления?", hint: "Акне, закрытые комедоны",
+    opts:[
+      {t:"Почти никогда", s:{T5:2, T2:1, T4:1}},
+      {t:"1-2 раза в месяц (зависит от цикла)", s:{T1:1, T5:1}},
+      {t:"Регулярно, каждую неделю", s:{T1:2, T2:1}},
+      {t:"Постоянно, это главная проблема", s:{T1:3}}
+    ]},
+  { title: "Как ваша кожа реагирует на новую косметику?", hint: "Чувствительность барьера",
+    opts:[
+      {t:"Без проблем, принимает всё", s:{T5:2, T1:1}},
+      {t:"Иногда бывает легкое пощипывание", s:{T5:1, T2:1}},
+      {t:"Часто краснеет, шелушится или зудит", s:{T2:3}},
+      {t:"Почти всегда вызывает реакцию или сыпь", s:{T2:4}}
+    ]},
+  { title: "Краснеет ли ваше лицо при смене температур, стрессе, от острого?", hint: "Сосудистая реакция (розацеа/купероз)",
+    opts:[
+      {t:"Нет, цвет лица стабильный", s:{T5:2, T1:1}},
+      {t:"Редко, если очень холодно или жарко", s:{T5:1}},
+      {t:"Да, часто краснею, румянец долго держится", s:{T2:2}},
+      {t:"Постоянно, есть заметная сосудистая сетка", s:{T2:4}}
+    ]},
+  { title: "Есть ли у вас пигментные пятна или следы от прыщей?", hint: "Работа меланоцитов",
+    opts:[
+      {t:"Нет, тон ровный", s:{T5:1}},
+      {t:"Есть легкие веснушки от солнца", s:{T3:1}},
+      {t:"Заметные темные следы после воспалений", s:{T3:2, T1:1}},
+      {t:"Выраженные пигментные пятна (мелазма, хлоазма)", s:{T3:4}}
+    ]},
+  { title: "Как бы вы описали тонус и упругость кожи?", hint: "Оценка коллагена",
+    opts:[
+      {t:"Отличный тонус, кожа плотная", s:{T5:1, T1:1}},
+      {t:"Начинаю замечать первые изменения (усталый вид)", s:{T4:1, T2:1}},
+      {t:"Заметны морщинки и снижение упругости", s:{T4:3}},
+      {t:"Выраженный птоз (овал поплыл), глубокие морщины", s:{T4:4}}
+    ]},
+  { title: "Как ваша кожа реагирует на солнце?", hint: "Склонность к фотоповреждению",
+    opts:[
+      {t:"Загораю легко, без ожогов", s:{T5:1}},
+      {t:"Загораю, но могу обгореть", s:{T5:1, T2:1}},
+      {t:"Сразу краснею и обгораю", s:{T2:2}},
+      {t:"Сразу появляются пигментные пятна", s:{T3:3}}
+    ]},
+  { title: "Как меняется ваша кожа зимой?", hint: "Реакция на сухой воздух и мороз",
+    opts:[
+      {t:"Практически не меняется", s:{T1:1, T5:1}},
+      {t:"Слегка сохнет, нужен крем плотнее", s:{T5:1, T4:1}},
+      {t:"Сильно сохнет и шелушится", s:{T2:3, T4:1}},
+      {t:"Становится красной и раздраженной", s:{T2:3}}
+    ]},
+  { title: "Ваш образ жизни (выберите наиболее актуальное сейчас):", hint: "Влияние системных факторов",
+    opts:[
+      {t:"Много стресса, недосып", s:{T4:1, T2:1, T1:1}},
+      {t:"Сидячая работа, мало свежего воздуха", s:{T4:1, T1:1}},
+      {t:"Часто пью кофе/алкоголь, курю", s:{T4:2, T2:1, T3:1}},
+      {t:"Стараюсь высыпаться и следить за питанием", s:{T5:2}}
+    ]},
+  { title: "Что вас беспокоит больше всего прямо сейчас?", hint: "Ваша главная цель (выбор умножит баллы)",
+    opts:[
+      {t:"Жирность, расширенные поры, высыпания", s:{T1:6}},
+      {t:"Сухость, стянутость, шелушение, чувствительность", s:{T2:6}},
+      {t:"Пигментные пятна, неровный цвет лица", s:{T3:6}},
+      {t:"Морщины, потеря тонуса и упругости", s:{T4:6}},
+      {t:"Всё в норме, просто хочу поддержать качество", s:{T5:6}}
+    ]}
 ];
 
-// ПРЕМИАЛЬНЫЕ ЭМОДЗИ
-const A = {
-  K1:{name:"Истощённая кожа",emoji:"🫧",desc:"Ваша кожа много работала — и устала. Она теряет влагу быстрее, чем успевает восполнить, барьер истончён, и любой внешний раздражитель ощущается острее обычного.",traits:["Стянутость после умывания, ощущение «картонки»","Кремы впитываются мгновенно и «перестают работать»","Ранние мимические морщины в зонах сухости","Склонность к шелушению на щеках"],rec:"Начнём с бережного восстановления гидролипидного барьера — и только потом перейдем к активным процедурам. Деликатный уход без агрессии вернет комфорт.",warn:null},
-  K2:{name:"Отёчная кожа",emoji:"🪶",desc:"Ваша кожа задерживает воду, токсины, усталость. Утром контуры лица «плывут», к обеду ситуация немного улучшается, но к вечеру возвращается ощущение тяжести.",traits:["Околоорбитальные отёки утром, пастозность овала","Долго не проходят следы от подушки после сна","Ощущение тяжести, «уставшее» лицо","Склонность к расширенным порам в зонах застоя"],rec:"Работаем с лимфодренажем, микроциркуляцией и тонусом сосудистого русла. Часто причина — в паттернах образа жизни, это легко скорректировать.",warn:null},
-  K3:{name:"Пигментная кожа",emoji:"🤍",desc:"Ваша кожа — это история инсоляции, микровоспалений или гормональных перепадов, отражённых в неровном тоне. Меланоциты работают избыточно активно.",traits:["Стойкие поствоспалительные пятна (постакне)","Гиперпигментация и неоднородный цвет лица","Хлоазма или мелазма разной степени выраженности","Мгновенное потемнение зон при минимальном солнце"],rec:"SPF-защита 50+ круглый год — Ваша базовая необходимость. Далее — системная работа с ингибиторами тирозиназы и лазерными методиками.",warn:null},
-  K4:{name:"Реактивная кожа",emoji:"🕊️",desc:"Ваша кожа — сверхчувствительный сенсор. Она моментально замечает смену климата, стрессы, новые кремы и отвечает ярким сосудистым ответом.",traits:["Стойкое или транзиторное покраснение на перепады температур","Субъективный дискомфорт: жжение, покалывание, зуд","Визуальные признаки купероза (телеангиэктазии)","Реакция на острую пищу, инсоляцию или алкоголь"],rec:"Максимальный минимализм в домашнем уходе, исключение агрессивных кислот и скрабов. Наша цель — успокоить рецепторное поле кожи.",warn:"Если эритема и сосудистая реакция носят постоянный характер — это прямое показание для очной диагностики розацеа или дерматита."},
-  K5:{name:"Возрастная кожа",emoji:"🧬",desc:"Ваша кожа проходит благородный путь естественной зрелости. Она просит изменения вектора ухода: не агрессивной стимуляции, а глубокого питания и поддержки ресурсов.",traits:["Снижение тургора, эластичности и четкости овала лица","Углубление статических и мимических морщин","Истончение эпидермиса, нарастающая сухость","Замедление процессов естественной клеточной регенерации"],rec:"Инвестируем исключительно в качество кожи. Работаем с восполнением дефицитов коллагена, поддержкой объёмов тканей и связочного аппарата.",warn:null},
-  K6:{name:"Комбинированная кожа",emoji:"🪞",desc:"Ваша кожа считает несколько противоположных состояний одновременно. Себовыделительная система Т-зоны гиперактивна, а U-зона страдает от дегидратации.",traits:["Выраженный жирный блеск в Т-зоне при сухих щеках","Периодические комедоны соседствуют с шелушением","Полярная реакция разных участков лица на один и тот же крем","Трудности с подбором универсального уходового средства"],rec:"Концепция «один крем для всего лица» неэффективна. Необходим мультимаскинг и позонное распределение активных себорегуляторов и увлажнителей.",warn:null}
+// ТИПЫ РЕЗУЛЬТАТОВ ПО БАУМАННУ
+const TYPES = {
+  T1: {
+    name: "Жирная / Смешанная", emoji: "🌊",
+    desc: "Ваш тип характеризуется активной работой сальных желез. Это защищает от ранних морщин, но провоцирует блеск, расширенные поры и склонность к комедонам (преобладание O+S по Бауманну).",
+    procs: ["Химический пилинг (AHA/BHA)", "Профессиональная чистка лица", "Маски с каолином и нормализующими активами"],
+    tests: ["Тестостерон, ДГЭА-С, ЛГ/ФСГ (исключение гормонального фактора)", "Инсулин, глюкоза, HOMA-индекс (инсулинорезистентность)", "Общий анализ крови, ферритин"],
+    nutri: ["Цинк (25–50 мг/сут)", "Витамин D (коррекция по анализу)", "Омега-3 (противовоспалительное)"]
+  },
+  T2: {
+    name: "Сухая / Чувствительная", emoji: "🏜️",
+    desc: "Ваша кожа имеет истонченный гидролипидный барьер. Она быстро теряет влагу, остро реагирует на перепады температур и новую косметику (D+S по Бауманну).",
+    procs: ["Ферментный / энзимный пилинг", "Процедуры глубокого увлажнения", "Криотерапия (успокоение сосудов)"],
+    tests: ["Ферритин, сывороточное железо", "Витамин D, B12", "Функция щитовидной железы (ТТГ, Т4 св.)"],
+    nutri: ["Витамин Е + С (антиоксиданты)", "Гиалуроновая кислота (внутрь)", "Омега-3 (для липидного барьера)"]
+  },
+  T3: {
+    name: "Пигментированная", emoji: "🌑",
+    desc: "В вашей коже меланоциты работают избыточно активно. Главная задача — контроль пигмента, выравнивание тона и строгая защита от УФ (P-тип по Бауманну).",
+    procs: ["Химический пилинг (ретиноловый, ТСА)", "Маски с азелаиновой кислотой и ниацинамидом", "Обязательно: SPF 50 ежедневно"],
+    tests: ["Половые гормоны (эстрадиол, прогестерон)", "Витамин B12, фолаты", "УЗИ яичников, Гомоцистеин"],
+    nutri: ["Витамин С (1000 мг/сут)", "Ниацинамид (системно)", "Глутатион (осветление изнутри)"]
+  },
+  T4: {
+    name: "Возрастная / Антиэйдж", emoji: "⏳",
+    desc: "Кожа находится в стадии снижения синтеза коллагена и эластина. Фокус ухода смещается на мощную стимуляцию, восполнение объемов и борьбу с гравитационным птозом (W-тип).",
+    procs: ["Ретиноловые пилинги", "Пептидные программы стимуляции", "IV-терапия (нутрицевтические капельницы)"],
+    tests: ["Половые гормоны (E2, тестостерон, DHEA)", "ИФР-1 (соматотропная функция)", "Ферритин, Витамин D, АМГ"],
+    nutri: ["Коэнзим Q10 (энергия клеток)", "Коллаген I/III типа + Витамин С", "Магний глицинат (стресс, тонус сосудов)"]
+  },
+  T5: {
+    name: "Нормальная / Профилактика", emoji: "🌸",
+    desc: "Ваша кожа в отличном состоянии (ORNT/DRNT). Главная задача сейчас — грамотно сохранить этот ресурс, обеспечить базовую защиту и профилактику старения.",
+    procs: ["Базовые уходовые программы", "Легкие увлажняющие маски", "SPF-защита в активное солнце"],
+    tests: ["Общий анализ крови", "Ферритин (депо железа)", "Витамин D и ТТГ (базовый чек-ап)"],
+    nutri: ["Витамин D + K2 (база)", "Омега-3 (1–2 г/сут)", "Антиоксидантный комплекс (C, E, цинк)"]
+  }
 };
-
-const FULL_POLICY_TEXT = `
-  <b>1. Общие положения</b><br>
-  Настоящая Политика обработки персональных данных составлена в соответствии с требованиями Федерального закона от 27.07.2006 № 152-ФЗ «О персональных данных» и определяет порядок обработки данных, предпринимаемый Администрацией клиники FGF Medical (Оператор) для модуля Telegram Mini App «Карта кожи по методу Миловской».<br><br>
-  
-  <b>2. Собираемые данные</b><br>
-  В рамках работы программного модуля сохраняются и подлежат обработке: предоставленное Пользователем имя (или текстовый псевдоним), уникальный Telegram ID учетной записи, возрастная подгруппа и выбранные варианты ответов аналитического квиза. Все указанные данные обрабатываются в обезличенном виде исключительно с целью выдачи персонализированной карты ухода.<br><br>
-  
-  <b>3. Безопасность и третьи лица</b><br>
-  Оператор принимает все необходимые организационные и технические меры для защиты персональных данных Пользователя от неправомерного доступа. Данные шифруются, хранятся внутри закрытого контура автоматизации клиники и никогда, ни при каких условиях не передаются, не продаются и не раскрываются третьим сторонам, за исключением прямых требований законодательства РФ.<br><br>
-  
-  <b>4. Сроки и отзыв согласия</b><br>
-  Данные хранятся в течение 3 лет с момента прохождения теста для обеспечения возможности ведения истории обращений. Субъект персональных данных имеет право в любой момент отозвать свое согласие и потребовать бесследного удаления информации из базы, направив сообщение главному врачу клиники в Telegram: @MilovskayaDR.
-`;
 
 let S = {
   screen: 'welcome',
-  userName: '', ageGroup: '', ageIdx: null,
-  qi: 0, scores: {K1:0,K2:0,K3:0,K4:0,K5:0,K6:0},
-  answers: [], sel: null, result: null,
-  consent: false, cerr: false, nerr: false,
-  showPolicy: false
+  userName: '',
+  qi: 0, scores: {T1:0, T2:0, T3:0, T4:0, T5:0},
+  answers: [], sel: null, result: null, consent: false, cerr: false, nerr: false
 };
 
-const TOTAL_STEPS = 12;
-
-function stepIndex() {
-  if(S.screen === 'name') return 1;
-  if(S.screen === 'age')  return 2;
-  if(S.screen === 'quiz') return 3 + S.qi;
-  if(S.screen === 'consent') return TOTAL_STEPS;
-  return 0;
-}
+const TOTAL_STEPS = Q.length;
 
 function render() {
   const app = document.getElementById('app');
   app.innerHTML = '';
 
-  // ЭКРАН ЗАГРУЗКИ С АНИМИРОВАННЫМ ЛОГОТИПОМ
   if(S.screen === 'loading') {
     app.innerHTML = `<div class="loading-full">
-      <img src="${LOGO_URL}" class="loading-logo" alt="Анализ...">
-      <div class="loading-title">Анализирую Вашу кожу...</div>
-      <div class="loading-sub">Составляю персональную карту кожи 🤍</div>
+      <img src="${PHOTO_URL}" class="loading-logo" alt="Анализ...">
+      <div class="cormorant loading-title">Синтезирую протокол...</div>
+      <div style="font-size:13px; color:var(--gray)">Анализирую биомаркеры 🤍</div>
     </div>`;
-    updateBack();
     return;
   }
 
   const isQuiz = S.screen === 'quiz';
-  const showBar = ['name','age','quiz','consent'].includes(S.screen);
   let header = '';
-  if(showBar) {
-    const si = stepIndex();
-    const pct = Math.round(si / TOTAL_STEPS * 100);
+  if(isQuiz) {
+    const pct = Math.round(((S.qi + 1) / TOTAL_STEPS) * 100);
     header = `<div class="top-bar">
       <div class="pb-outer"><div class="pb-inner" style="width:${pct}%"></div></div>
-      <div class="step-txt">${si} / ${TOTAL_STEPS}</div>
+      <div class="step-txt">${S.qi + 1} / ${TOTAL_STEPS}</div>
     </div>`;
   }
 
   let body = '', foot = '';
   if(S.screen === 'welcome') { body = bWelcome(); foot = fWelcome(); }
+  if(S.screen === 'prep')    { body = bPrep();    foot = fPrep();    }
   if(S.screen === 'name')    { body = bName();    foot = fName();    }
-  if(S.screen === 'age')     { body = bAge();     foot = fAge();     }
   if(S.screen === 'quiz')    { body = bQuiz();    foot = fQuiz();    }
   if(S.screen === 'consent') { body = bConsent(); foot = fConsent(); }
   if(S.screen === 'result')  { body = bResult();  foot = fResult();  }
-  if(S.screen === 'cta')     { body = bCTA();     foot = fCTA();     }
 
-  app.innerHTML = `${header}<div class="content${isQuiz ? ' quiz-content' : ''}">${body}</div><div class="bottom">${foot}</div>`;
-  updateBack();
+  app.innerHTML = `${header}<div class="content${isQuiz ? ' quiz-content' : ''}">${body}</div>${foot ? `<div class="bottom">${foot}</div>` : ''}`;
   bind();
-
-  const ni = document.getElementById('nameInput');
-  if(ni) { setTimeout(() => ni.focus(), 120); }
+  
+  if(S.screen === 'name') { setTimeout(() => document.getElementById('nameInput')?.focus(), 100); }
 }
 
 function bWelcome() {
   const gr = tgName ? `, ${tgName}` : '';
   return `
     <div class="logo-wrap">
-      <img class="logo-img" src="${LOGO_URL}"
-        onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="FGF Medical">
-      <div class="logo-fallback"></div>
+      <img class="logo-img" src="${PHOTO_URL}" onerror="this.style.display='none'" alt="Ирина Миловская">
     </div>
-    <h1 class="welcome-title">Карта кожи<br>по методу Миловской</h1>
-    <p class="welcome-by">Добро пожаловать${gr}!<br>Диагностический инструмент Ирины Миловской — врача-косметолога, дерматолога, главного врача клиники FGF Medical</p>
+    <h1 class="cormorant welcome-title">Карта кожи<br>от Ирины Миловской</h1>
+    <p class="welcome-by">Привет${gr}! Я Ирина — ваш личный мини-косметолог 👩‍⚕️<br><br>Давайте за 2 минуты определим клинический тип вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.</p>
+    <div class="method-note">Алгоритм основан на международной классификации Baumann Skin Type System (BSTI) с клинической адаптацией</div>
     <div class="stats-row">
       <div class="stat-item"><div class="stat-num">12</div><div class="stat-lbl">вопросов</div></div>
-      <div class="stat-item"><div class="stat-num">3</div><div class="stat-lbl">минуты</div></div>
-      <div class="stat-item"><div class="stat-num">6</div><div class="stat-lbl">архетипов</div></div>
-    </div>
-    <div class="divider"></div>
-    <div class="notice">🩺 <strong>Информация:</strong> Данный квиз разработан на основе клинического опыта и носит ознакомительный характер. Результат <strong>не заменяет медицинский диагноз</strong>.</div>`;
+      <div class="stat-item"><div class="stat-num">2</div><div class="stat-lbl">минуты</div></div>
+      <div class="stat-item"><div class="stat-num">360°</div><div class="stat-lbl">подход</div></div>
+    </div>`;
+}
+function fWelcome() {
+  return `<button class="btn btn-black" onclick="triggerHaptic('medium'); S.screen='prep'; render()">Начать диагностику →</button>`;
 }
 
-function fWelcome() {
+function bPrep() {
   return `
-    <button class="btn btn-black" onclick="triggerHaptic('medium'); S.screen='name'; render()">Начать экспресс-тест →</button>
-    <div class="welcome-subtext">Нажимая кнопку, Вы выражаете согласие с 
-      <span onclick="openPolicyInline()">Политикой конфиденциальности</span>
+    <div class="name-screen">
+      <span class="prep-icon">💧</span>
+      <h2 class="cormorant ns-title">Правила подготовки</h2>
+      <p class="ns-sub">Чтобы алгоритм сработал точно, мы должны оценить истинное состояние вашей гидролипидной мантии.</p>
+      
+      <div class="prep-list">
+        <div class="prep-item">
+          <div class="prep-num">1</div>
+          <div class="prep-txt">Умойтесь вашим обычным очищающим средством (пенкой или гелем).</div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-num">2</div>
+          <div class="prep-txt"><b>Не наносите ничего!</b> Ни тоник, ни сыворотку, ни крем.</div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-num">3</div>
+          <div class="prep-txt">Подождите 30 минут. Прислушайтесь к ощущениям кожи.</div>
+        </div>
+      </div>
     </div>`;
+}
+function fPrep() {
+  return `<button class="btn btn-black" onclick="triggerHaptic('light'); S.screen='name'; render()">Я выполнил(а) условия →</button>`;
 }
 
 function bName() {
   return `
     <div class="name-screen">
-      <span class="ns-emoji">👋</span>
-      <h2 class="ns-title">Как к Вам обращаться?</h2>
-      <p class="ns-sub">Ирина сформирует именные персональные рекомендации на базе Ваших ответов</p>
+      <span class="prep-icon">📝</span>
+      <h2 class="cormorant ns-title">Как к Вам обращаться?</h2>
+      <p class="ns-sub">Я сформирую именной протокол, который вы сможете скачать в формате PDF.</p>
       <label class="input-label">Ваше имя</label>
-      <input id="nameInput" class="input-field" type="text" placeholder="Например: Екатерина"
-        value="${S.userName}" maxlength="40" autocomplete="given-name"
-        oninput="S.userName=this.value; S.nerr=false; document.getElementById('nerr').classList.remove('show');">
-      <div id="nerr" class="err-hint ${S.nerr?'show':''}">Пожалуйста, введите корректное имя (минимум 2 символа)</div>
+      <input id="nameInput" class="input-field" type="text" placeholder="Например: Екатерина" value="${S.userName}" maxlength="30" oninput="S.userName=this.value; S.nerr=false; document.getElementById('nerr').classList.remove('show');">
+      <div id="nerr" class="err-hint ${S.nerr?'show':''}">Пожалуйста, введите имя (от 2 букв)</div>
     </div>`;
 }
-
 function fName() {
   return `
-    <button class="btn btn-black" onclick="submitName()">Далее →</button>
-    <button class="btn btn-outline" onclick="triggerHaptic('light'); goBack()">← Назад</button>`;
-}
-
-function bAge() {
-  const displayName = S.userName ? `, ${S.userName.trim()}` : '';
-  return `
-    <div class="name-screen">
-      <span class="ns-emoji">🎂</span>
-      <h2 class="ns-title">Укажите Ваш возраст${displayName}</h2>
-      <p class="ns-sub">Возрастные особенности напрямую влияют на метаболизм и архитектонику кожи</p>
-      <div class="age-opts">
-        ${AGE_GROUPS.map((ag,i) => `
-          <div class="age-opt${S.ageIdx===i?' sel':''}" data-ai="${i}">
-            <div class="age-radio"></div>
-            <span>${ag.label}</span>
-          </div>`).join('')}
-      </div>
-    </div>`;
-}
-
-function fAge() {
-  return `
-    <button class="btn btn-black" ${S.ageIdx===null?'disabled':''} onclick="submitAge()">Далее →</button>
-    <button class="btn btn-outline" onclick="triggerHaptic('light'); goBack()">← Назад</button>`;
+    <button class="btn btn-black" onclick="submitName()">Перейти к вопросам →</button>
+    <button class="btn btn-outline" onclick="triggerHaptic('light'); S.screen='prep'; render()">← Назад</button>`;
 }
 
 function bQuiz() {
   const q = Q[S.qi];
   return `
     <div class="q-card">
-      <h2 class="q-title">${q.title}</h2>
+      <h2 class="cormorant q-title">${q.title}</h2>
       ${q.hint ? `<p class="q-hint">${q.hint}</p>` : ''}
     </div>
     <div class="opts">
@@ -514,161 +442,90 @@ function bQuiz() {
         </div>`).join('')}
     </div>`;
 }
-
 function fQuiz() {
-  return `
-    <button class="btn btn-black" ${S.sel===null?'disabled':''} onclick="nextQ()">Далее →</button>
-    <button class="btn btn-outline" onclick="goBack()">← Назад</button>`;
+  return `<button class="btn btn-black" ${S.sel===null?'disabled':''} onclick="nextQ()">Далее →</button>`;
 }
 
 function bConsent() {
   const nameGreet = S.userName ? `, ${S.userName.trim()}` : '';
   return `
     <div class="consent-screen">
-      <span class="consent-icon">📋</span>
-      <h2 class="consent-title">Финальный шаг${nameGreet}</h2>
-      <p class="consent-sub">Подтвердите согласие для обработки персональных данных и вывода карты кожи</p>
+      <span class="prep-icon">📋</span>
+      <h2 class="cormorant ns-title">Финальный шаг${nameGreet}</h2>
+      <p class="consent-sub">Подтвердите согласие для расчета клинического алгоритма</p>
       <div id="cr" class="consent-row ${S.consent?'active':''}">
         <div class="check-box"><span class="check-mark">✓</span></div>
-        <div class="consent-txt">Даю согласие на обработку моих персональных данных согласно 
-          <span class="consent-link" onclick="event.stopPropagation(); openPolicyInline();">Политике конфиденциальности</span> и требованиям ФЗ № 152-ФЗ
-        </div>
+        <div class="consent-txt">Соглашаюсь на обработку данных согласно <span class="consent-link" onclick="event.stopPropagation(); document.getElementById('policyModal').classList.add('show');">Политике конфиденциальности</span></div>
       </div>
-      <div id="cerr" class="err-hint ${S.cerr?'show':''}">Пожалуйста, подтвердите согласие для продолжения</div>
-      <div class="consent-brief-box">
-        <b>Краткое разъяснение ФЗ-152:</b> Ваше имя, диапазон возраста и ответы используются клиникой FGF Medical исключительно конфиденциально для расчета архетипа ухода. Данные никогда не покинут внутреннюю базу клиники.
-      </div>
+      <div id="cerr" class="err-hint ${S.cerr?'show':''}">Необходимо согласие для продолжения</div>
     </div>`;
 }
-
 function fConsent() {
-  return `
-    <button class="btn btn-black" onclick="submitConsent()">Сформировать результат 🎯</button>
-    <button class="btn btn-outline" onclick="goBack()">← Назад</button>`;
+  return `<button class="btn btn-black" onclick="submitConsent()">Сформировать мой протокол 🎯</button>`;
 }
 
 function bResult() {
-  const a = A[S.result];
-  const procs = PROC_BY_ARCH[S.result];
-  
-  // ПАРАДИГМА: Изменили заголовок "Ваш архетип и процедуры" -> "Ваша персональная стратегия здоровья кожи"
+  const t = TYPES[S.result];
   return `
-    <div class="result-top">
-      <span class="res-emoji">${a.emoji}</span>
-      <div class="res-tag">Ваша персональная стратегия здоровья кожи</div>
-      <h2 class="res-name">${a.name}</h2>
-      <p class="res-desc">${a.desc}</p>
-    </div>
-    <div class="section-label">Ключевые проявления и маркеры</div>
-    <div class="trait-list">
-      ${a.traits.map(t => `<div class="trait-line"><div class="tdot"></div><span>${t}</span></div>`).join('')}
-    </div>
-    ${a.warn ? `<div class="warn-box">⚠️ Пояснение эксперта: ${a.warn}</div>` : ''}
-    <div class="rec-box">
-      <div class="rec-head">💬 Стратегия ухода от Ирины</div>
-      <div class="rec-body">${a.rec}</div>
-    </div>
-    <div class="proc-section-title">Профессиональные процедуры ${procs.label}:</div>
-    <div style="margin-bottom:20px">
-      ${procs.items.map(p =>
-        `<span class="proc-tag" onclick="triggerHaptic('light'); openProcInBot('${p.cmd}')">${p.name}</span>`
-      ).join('')}
-    </div>
-    <div class="fine-print">🩺 Результаты анализа носят предварительный характер и требуют верификации на очной консультации врача-косметолога.</div>`;
+    <div style="padding: 24px 0 40px;">
+      <div style="text-align:center; margin-bottom:24px;">
+        <span class="res-emoji">${t.emoji}</span>
+        <div class="res-tag">Ваш клинический профиль</div>
+        <h2 class="cormorant res-name">${t.name}</h2>
+        <p class="res-desc">${t.desc}</p>
+      </div>
+
+      <div class="r-section">
+        <div class="r-title">💉 Косметология (Клинический этап)</div>
+        <div class="r-card">
+          <ul class="r-ul">
+            ${t.procs.map(p => `<li class="r-li">${p}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+
+      <div class="r-section">
+        <div class="r-title">🧪 Check-Up (Лабораторный контроль)</div>
+        <div class="r-card" style="background: #FAFAFA;">
+          <ul class="r-ul">
+            ${t.tests.map(c => `<li class="r-li">${c}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+
+      <div class="r-section">
+        <div class="r-title">💊 Нутрицевтическая поддержка</div>
+        <div style="margin-top: 8px;">
+          ${t.nutri.map(n => `<span class="nutri-tag">${n}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="fine-print">Данный протокол носит информационный характер и требует клинического подтверждения на очной консультации врача-косметолога.</div>
+    </div>`;
 }
 
 function fResult() {
   return `
-    <button class="btn btn-gold" onclick="triggerHaptic('medium'); goCTA()">✍️ Консультация и запись к Ирине</button>
-    <button class="btn btn-outline-dark" onclick="triggerHaptic('light'); openProcInBot('proc_select_${S.result}')">🔎 Подобрать детальную процедуру</button>
-    <button class="btn btn-outline" onclick="triggerHaptic('light'); reset()">🔄 Пройти тестирование заново</button>`;
+    <button class="btn btn-gold" onclick="triggerHaptic('medium'); openBotLink('get_pdf_protocol')">📥 Скачать PDF-протокол (в бот)</button>
+    <button class="btn btn-black" style="margin-top:2px;" onclick="triggerHaptic('medium'); openBotLink('book_consultation')">✍️ Записаться на диагностику к Ирине</button>
+    `;
 }
 
-function bCTA() {
-  const nameGreet = S.userName ? `, ${S.userName.trim()}` : '';
-  return `
-    <div class="doctor-section">
-      <img class="doc-avatar" src="${PHOTO_URL}"
-        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Ирина Миловская">
-      <div class="doc-avatar-ph" style="display:none">👩‍⚕️</div>
-      <h2 class="doc-name">Ирина Миловская</h2>
-      <div class="doc-pos">Врач-дерматолог, косметолог<br>Главный врач клиники FGF Medical</div>
-      <div class="info-card">
-        <div class="info-line"><span class="info-ic">🏥</span><span>FGF Medical, г. Санкт-Петербург</span></div>
-        <div class="info-line"><span class="info-ic">📅</span><span>График приема: Чт, Пт, Вс · 10:00–21:00</span></div>
-        <div class="info-line"><span class="info-ic">📍</span><span>Васильевский Остров, Малый пр., 64, к. 1</span></div>
-        <div class="info-line"><span class="info-ic">📞</span><span>Рецепция: +7 812 509-63-33</span></div>
-      </div>
-      <p style="font-size:14px; color:var(--gray); line-height:1.6; margin-bottom:20px; padding: 0 4px;">
-        ${nameGreet ? `${S.userName.trim()}, Ваш` : 'Ваш'} ведущий архетип кожи — <strong>${A[S.result].name}</strong>.<br>
-        Вы можете напрямую обратиться к Ирине лично или связаться с администраторами клиники для выбора времени.
-      </p>
-    </div>`;
-}
-
-function fCTA() {
-  return `
-    <a href="https://t.me/MilovskayaDR" class="btn btn-black" target="_blank" onclick="triggerHaptic('medium')">✍️ Связаться с Ириной напрямую</a>
-    <a href="https://t.me/fgf_medical" class="btn btn-outline" target="_blank" onclick="triggerHaptic('light')">📞 Написать координатору клиники</a>
-    <button class="btn btn-outline" onclick="triggerHaptic('light'); S.screen='result'; render()">← Посмотреть карту кожи</button>`;
-}
-
-function openPolicyInline() {
-  triggerHaptic('light');
-  document.getElementById('modalBodyContent').innerHTML = FULL_POLICY_TEXT;
-  document.getElementById('policyModal').classList.add('show');
-}
-
-function closePolicyModal() {
-  document.getElementById('policyModal').classList.remove('show');
-}
-
+// УТИЛИТЫ И ЛОГИКА
 function bind() {
   document.querySelectorAll('.opt').forEach(el => {
-    el.addEventListener('click', () => { 
-      triggerHaptic('light');
-      S.sel = +el.dataset.i; 
-      render(); 
-    });
-  });
-  document.querySelectorAll('.age-opt').forEach(el => {
-    el.addEventListener('click', () => { 
-      triggerHaptic('light');
-      S.ageIdx = +el.dataset.ai; 
-      S.ageGroup = AGE_GROUPS[S.ageIdx].value; 
-      render(); 
-    });
+    el.addEventListener('click', () => { triggerHaptic('light'); S.sel = +el.dataset.i; render(); });
   });
   const cr = document.getElementById('cr');
-  if(cr) cr.addEventListener('click', () => { 
-    triggerHaptic('light');
-    S.consent = !S.consent; 
-    S.cerr = false; 
-    render(); 
-  });
+  if(cr) cr.addEventListener('click', () => { triggerHaptic('light'); S.consent = !S.consent; S.cerr = false; render(); });
   const ni = document.getElementById('nameInput');
-  if(ni) {
-    ni.addEventListener('keydown', e => { 
-      if(e.key === 'Enter') submitName(); 
-    });
-  }
+  if(ni) ni.addEventListener('keydown', e => { if(e.key === 'Enter') submitName(); });
 }
 
 function submitName() {
-  const clean = (S.userName || '').trim();
-  if(clean.length < 2 || !/[А-ЯЁа-яёA-Za-z]/.test(clean)) {
-    triggerHaptic('warning');
-    S.nerr = true; render(); return;
-  }
-  triggerHaptic('medium');
-  S.userName = clean;
-  S.screen = 'age'; render();
-}
-
-function submitAge() {
-  if(S.ageIdx === null) return;
-  triggerHaptic('medium');
-  S.screen = 'quiz'; render();
+  const c = (S.userName || '').trim();
+  if(c.length < 2) { S.nerr = true; render(); triggerHaptic('warning'); return; }
+  triggerHaptic('medium'); S.userName = c; S.screen = 'quiz'; render();
 }
 
 function nextQ() {
@@ -677,90 +534,27 @@ function nextQ() {
   const o = Q[S.qi].opts[S.sel];
   for(const [k, v] of Object.entries(o.s)) S.scores[k] += v;
   S.answers.push(S.sel); S.sel = null;
-  if(S.qi < Q.length - 1) {
-    S.qi++; render();
-  } else {
-    S.screen = 'consent'; render();
-  }
+  if(S.qi < Q.length - 1) { S.qi++; render(); }
+  else { S.screen = 'consent'; render(); }
 }
 
 function submitConsent() {
-  if(!S.consent) { 
-    triggerHaptic('warning');
-    S.cerr = true; render(); return; 
-  }
-  triggerHaptic('heavy');
-  S.screen = 'loading'; render();
-  setTimeout(calcResult, 2000);
-}
-
-function goBack() {
-  if(S.screen === 'name')    { S.screen = 'welcome'; render(); return; }
-  if(S.screen === 'age')     { S.screen = 'name';    render(); return; }
-  if(S.screen === 'quiz') {
-    if(S.qi > 0) {
-      const last = S.answers.pop();
-      if(last !== undefined) {
-        const o = Q[S.qi-1].opts[last];
-        for(const [k,v] of Object.entries(o.s)) S.scores[k] -= v;
-      }
-      S.qi--; S.sel = null; render();
-    } else {
-      S.screen = 'age'; render();
-    }
-    return;
-  }
-  if(S.screen === 'consent') {
-    S.qi = Q.length - 1;
-    S.sel = S.answers.length > 0 ? S.answers[S.answers.length - 1] : null;
-    S.screen = 'quiz'; render(); return;
-  }
-  if(S.screen === 'cta') { S.screen = 'result'; render(); }
+  if(!S.consent) { S.cerr = true; render(); triggerHaptic('warning'); return; }
+  triggerHaptic('success'); S.screen = 'loading'; render();
+  setTimeout(calcResult, 2200);
 }
 
 function calcResult() {
-  let max = -1, win = 'K1';
-  for(const [k, v] of Object.entries(S.scores)) { 
-    if(v > max) { max = v; win = k; } 
-  }
-  triggerHaptic('success');
-  S.result = win; 
-  S.screen = 'result';
-  render();
+  let max = -1, win = 'T5';
+  for(const [k, v] of Object.entries(S.scores)) { if(v > max) { max = v; win = k; } }
+  S.result = win; S.screen = 'result'; render();
 }
 
-function goCTA() { S.screen = 'cta'; render(); }
+function closePolicyModal() { document.getElementById('policyModal').classList.remove('show'); }
 
-function reset() {
-  S = { screen:'welcome', userName:'', ageGroup:'', ageIdx:null,
-        qi:0, scores:{K1:0,K2:0,K3:0,K4:0,K5:0,K6:0},
-        answers:[], sel:null, result:null,
-        consent:false, cerr:false, nerr:false, showPolicy:false };
-  render();
-}
-
-function openProcInBot(cmd) {
-  const url = `https://t.me/${BOT_USERNAME}?start=${cmd}`;
-  try {
-    tg.openTelegramLink(url);
-  } catch(e) {
-    window.open(url, '_blank');
-  }
-}
-
-const backHandler = () => goBack();
-function updateBack() {
-  try {
-    tg.BackButton.offClick(backHandler);
-    if(['welcome', 'result', 'cta', 'loading'].includes(S.screen)) {
-      tg.BackButton.hide();
-    } else {
-      tg.BackButton.show();
-      tg.BackButton.onClick(backHandler);
-    }
-  } catch(e) {
-    console.log('Error with BackButton API:', e);
-  }
+function openBotLink(cmd) {
+  const url = `https://t.me/AssistentMilovskayaBot?start=${cmd}`;
+  try { tg.openTelegramLink(url); } catch(e) { window.open(url, '_blank'); }
 }
 
 render();
