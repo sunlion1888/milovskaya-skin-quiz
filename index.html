@@ -18,8 +18,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--tg-theme-bg-color, #F8F6F3);
-      color: var(--tg-theme-text-color, var(--dark));
+      background: #F8F6F3 !important;
+color: #2C2C2C !important;
       max-width: 480px;
       margin: 0 auto;
       padding: 20px 16px 40px;
@@ -184,7 +184,7 @@
 // ============================================================
 const tg = window.Telegram.WebApp;
 tg.ready();
-tg.expand();
+setTimeout(() => { tg.expand(); }, 100);
 
 const userName = (tg.initDataUnsafe && tg.initDataUnsafe.user)
   ? tg.initDataUnsafe.user.first_name
