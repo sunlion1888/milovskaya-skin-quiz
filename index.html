@@ -101,7 +101,7 @@ body {
 .notice { background: var(--gray-light); border-radius: var(--r-sm); border-left: 3px solid var(--gold); padding: 16px 18px; font-size: 13.5px; color: #444; line-height: 1.6; margin-bottom: 24px; }
 .notice strong { color: var(--black); }
 .welcome-subtext { font-size: 11px; color: #A5A5A5; text-align: center; line-height: 1.6; margin-top: 6px; }
-.welcome-subtext a { color: var(--gold-h); text-decoration: none; font-weight: 500; }
+.welcome-subtext span { color: var(--gold-h); font-weight: 500; cursor: pointer; text-decoration: underline; }
 
 /* NAME SCREEN & AGE */
 .name-screen { padding-top: 24px; }
@@ -116,6 +116,7 @@ body {
   -webkit-appearance: none;
 }
 .input-field:focus { border-color: var(--gold); box-shadow: 0 4px 12px rgba(200, 168, 130, 0.1); }
+.input-field::placeholder { color: #CCCCCC; }
 .input-field::placeholder { color: #CCCCCC; }
 .input-label { font-size: 11px; font-weight: 700; color: var(--gray); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 10px; display: block; }
 .err-hint { font-size: 12.5px; color: #CC3333; margin-top: 8px; display: none; font-weight: 500; }
@@ -183,9 +184,8 @@ body {
 .check-mark { color: white; font-size: 12px; font-weight: 700; display: none; }
 .consent-row.active .check-mark { display: block; }
 .consent-txt { font-size: 13.5px; color: var(--black); line-height: 1.6; }
-.consent-link { color: var(--gold-h); text-decoration: underline; }
-.consent-policy-block { background: var(--gray-light); border-radius: var(--r-sm); padding: 16px 18px; font-size: 12px; color: #555; line-height: 1.7; margin-top: 16px; border: 1px solid var(--border); }
-.consent-policy-block b { color: var(--black); }
+.consent-link { color: var(--gold-h); text-decoration: underline; cursor: pointer; font-weight: 500; }
+.consent-brief-box { background: var(--gray-light); border-radius: var(--r-sm); padding: 16px 18px; font-size: 12.5px; color: #555; line-height: 1.65; margin-top: 16px; border: 1px solid var(--border); }
 
 /* LOADING SCREEN */
 .loading-full {
@@ -213,12 +213,11 @@ body {
 .warn-box { background: #FFF9EE; border-radius: var(--r-sm); padding: 14px 18px; font-size: 14px; color: #7C4F00; line-height: 1.6; margin-bottom: 16px; border-left: 4px solid var(--gold); }
 .fine-print { font-size: 11.5px; color: #AAAAAA; text-align: center; line-height: 1.6; padding-bottom: 6px; }
 
-/* ТЕГИ ПРОЦЕДУР (АКТИВНЫЕ КНОПКИ-ПИЛЮЛИ) */
 .proc-section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-bottom: 12px; margin-top: 8px; }
 .proc-tag { display: inline-block; background: var(--white); border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.01); border-radius: 24px; padding: 7px 16px; font-size: 13.5px; font-weight: 500; color: var(--black); margin: 4px 6px 6px 0; cursor: pointer; transition: all 0.2s ease; }
 .proc-tag:active { background: var(--black); color: #fff; border-color: var(--black); transform: scale(0.96); }
 
-/* CTA / DOCTOR SECTION */
+/* CTA SECTION */
 .doctor-section { text-align: center; padding-top: 24px; }
 .doc-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; display: block; margin: 0 auto 16px; box-shadow: 0 8px 24px rgba(200, 168, 130, 0.2); }
 .doc-avatar-ph { width: 120px; height: 120px; border-radius: 50%; background: var(--gray-light); border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 56px; margin: 0 auto 16px; }
@@ -227,10 +226,60 @@ body {
 .info-line { display: flex; align-items: center; gap: 14px; padding: 15px 18px; font-size: 14.5px; color: var(--black); border-bottom: 1px solid #F5F5F5; text-align: left; }
 .info-line:last-child { border-bottom: none; }
 .info-ic { font-size: 20px; flex-shrink: 0; }
+
+/* НАТИВНОЕ МОДАЛЬНОЕ ОКНО ДЛЯ ПРОСМОТРА ПОЛИТИКИ (iOS/Android Style) */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4); z-index: 1000;
+  display: none; align-items: flex-end; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal-window {
+  width: 100%; max-width: 480px; background: #FFFFFF;
+  border-top-left-radius: var(--r); border-top-right-radius: var(--r);
+  max-height: 85dvh; display: flex; flex-direction: column;
+  animation: slideTop 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  padding-bottom: calc(10px + var(--sb));
+}
+@keyframes slideTop {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-header {
+  padding: 20px 24px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.modal-title { font-size: 16px; font-weight: 700; color: var(--black); }
+.modal-close {
+  background: var(--gray-light); border: none; width: 30px; height: 30px;
+  border-radius: 50%; font-size: 16px; font-weight: 600; color: var(--gray);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.modal-body {
+  flex: 1; overflow-y: auto; padding: 20px 24px;
+  font-size: 13.5px; color: #333333; line-height: 1.65;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-body b { color: var(--black); display: block; margin-top: 14px; margin-bottom: 4px; }
+.modal-body b:first-child { margin-top: 0; }
 </style>
 </head>
 <body>
+
 <div id="app"></div>
+
+<!-- Единственный нативный оверлей для соглашений внутри приложения -->
+<div id="policyModal" class="modal-overlay" onclick="closePolicyModal()">
+  <div class="modal-window" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Правовые документы</div>
+      <button class="modal-close" onclick="closePolicyModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBodyContent">
+      <!-- Контент подгружается динамически на лету -->
+    </div>
+  </div>
+</div>
 
 <script>
 const tg = window.Telegram.WebApp;
@@ -241,7 +290,6 @@ setTimeout(() => tg.expand(), 120);
 
 const tgName = tg.initDataUnsafe?.user?.first_name || '';
 
-// Функция для запуска нативной тактильной отдачи (Haptic Feedback)
 function triggerHaptic(type = 'light') {
   try {
     if (tg.HapticFeedback) {
@@ -252,13 +300,12 @@ function triggerHaptic(type = 'light') {
       else if (type === 'warning') tg.HapticFeedback.notificationOccurred('warning');
     }
   } catch(e) {
-    console.log('Haptic feedback not supported or error:', e);
+    console.log(e);
   }
 }
 
 const LOGO_URL   = 'https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/logo.png';
 const PHOTO_URL  = 'https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/photo.jpg';
-const POLICY_URL = 'https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/policy.html';
 const BOT_USERNAME = 'AssistentMilovskayaBot';
 
 const AGE_GROUPS = [
@@ -341,7 +388,7 @@ const Q = [
     opts:[{t:"Отёчная, следы от подушки долго не проходят",s:{K2:3}},{t:"Сухая, тусклая, нужно «раскачиваться»",s:{K1:2,K5:1}},{t:"Пятна утром заметнее, чем вечером",s:{K3:2}},{t:"Покраснения, иногда высыпания",s:{K4:2}},{t:"T-зона блестит, остальное ок",s:{K6:2}},{t:"В целом нормально",s:{K5:1,K6:1}}]},
   { title: "Что чаще всего ухудшает Вашу кожу?", hint: "Один или несколько факторов",
     opts:[{t:"Стресс и усталость",s:{K1:2,K4:1}},{t:"Солёная еда, алкоголь, мало движения",s:{K2:3}},{t:"Солнце и гормональные изменения",s:{K3:3}},{t:"Холод, ветер, острое, новая косметика",s:{K4:3}},{t:"Возраст — всё медленнее обновляется",s:{K5:3}},{t:"Гормональные перепады, цикл",s:{K6:2,K3:1}}]},
-  { title: "Как Ваша кожа удерживает увлажнение?", hint: "После нанесения крема или сыворотки",
+  { title: "Как Ваша кожа удерживает увлажнение?", hint: "После нанесения крем или сыворотки",
     opts:[{t:"Плохо, кремы не работают, быстро сохнет",s:{K1:3}},{t:"К вечеру нужно обновить увлажнение",s:{K6:1,K5:1}},{t:"Нормально, но при этом есть отёки",s:{K2:2}},{t:"Реагирует покраснением на некоторые кремы",s:{K4:2}},{t:"С возрастастом держит хуже",s:{K5:2}},{t:"T-зона не нуждается, щёки очень нуждаются",s:{K6:3}}]},
   { title: "Что происходит с зоной вокруг глаз?", hint: "Состояние без макияжа",
     opts:[{t:"Мелкие морщинки, сухость, шелушение",s:{K1:2,K5:2}},{t:"Постоянные мешки и тёмные круги",s:{K2:3}},{t:"Пигментные пятна под глазами",s:{K3:2}},{t:"Отекает и краснеет периодически",s:{K4:2}},{t:"Глубокие морщины, птоз, потеря упругости",s:{K5:2}},{t:"Всё в норме",s:{K6:1}}]},
@@ -355,20 +402,21 @@ const A = {
   K3:{name:"Пигментная кожа",emoji:"🌑",desc:"Ваша кожа — это история инсоляции, микровоспалений или гормональных перепадов, отражённых в неровном тоне. Меланоциты работают избыточно активно.",traits:["Стойкие поствоспалительные пятна (постакне)","Гиперпигментация и неоднородный цвет лица","Хлоазма или мелазма разной степени выраженности","Мгновенное потемнение зон при минимальном солнце"],rec:"SPF-защита 50+ круглый год — Ваша базовая необходимость. Далее — системная работа с ингибиторами тирозиназы и лазерными методиками.",warn:null},
   K4:{name:"Реактивная кожа",emoji:"⚡",desc:"Ваша кожа — сверхчувствительный сенсор. Она моментально замечает смену климата, стрессы, новые кремы и отвечает ярким сосудистым ответом.",traits:["Стойкое или транзиторное покраснение на перепады температур","Субъективный дискомфорт: жжение, покалывание, зуд","Визуальные признаки купероза (телеангиэктазии)","Реакция на острую пищу, инсоляцию или алкоголь"],rec:"Максимальный минимализм в домашнем уходе, исключение агрессивных кислот и скрабов. Наша цель — успокоить рецепторное поле кожи.",warn:"Если эритема и сосудистая реакция носят постоянный характер — это прямое показание для очной диагностики розацеа или дерматита."},
   K5:{name:"Возрастная кожа",emoji:"🌸",desc:"Ваша кожа проходит благородный путь естественной зрелости. Она просит изменения вектора ухода: не агрессивной стимуляции, а глубокого питания и поддержки ресурсов.",traits:["Снижение тургора, эластичности и четкости овала лица","Углубление статических и мимических морщин","Истончение эпидермиса, нарастающая сухость","Замедление процессов естественной клеточной регенерации"],rec:"Инвестируем исключительно в качество кожи. Работаем с восполнением дефицитов коллагена, поддержкой объёмов тканей и связочного аппарата.",warn:null},
-  K6:{name:"Комбинированная кожа",emoji:"🎭",desc:"Ваша кожа сочетает несколько противоположных состояний одновременно. Себовыделительная система Т-зоны гиперактивна, а U-зона страдает от дегидратации.",traits:["Выраженный жирный блеск в Т-зоне при сухих щеках","Периодические комедоны соседствуют с шелушением","Полярная реакция разных участков лица на один и тот же крем","Трудности с подбором универсального уходового средства"],rec:"Концепция «один крем для всего лица» неэффективна. Необходим мультимаскинг и позонное распределение активных себорегуляторов и увлажнителей.",warn:null}
+  K6:{name:"Комбинированная кожа",emoji:"🎭",desc:"Ваша кожа считает несколько противоположных состояний одновременно. Себовыделительная система Т-зоны гиперактивна, а U-зона страдает от дегидратации.",traits:["Выраженный жирный блеск в Т-зоне при сухих щеках","Периодические комедоны соседствуют с шелушением","Полярная реакция разных участков лица на один и тот же крем","Трудности с подбором универсального уходового средства"],rec:"Концепция «один крем для всего лица» неэффективна. Необходим мультимаскинг и позонное распределение активных себорегуляторов и увлажнителей.",warn:null}
 };
 
-const POLICY_TEXT = `
-<b>Политика обработки персональных данных</b><br><br>
-<b>Оператор:</b> ООО / ИП FGF Medical, Санкт-Петербург<br>
-<b>Контакт:</b> <a href="https://t.me/fgf_medical" class="consent-link">@fgf_medical</a><br><br>
-<b>1. Что собирается:</b> имя (никнейм), Telegram ID, возраст, ответы на вопросы квиза.<br><br>
-<b>2. Цель:</b> персонализация рекомендаций по типу кожи, связь с врачом, ведение записи.<br><br>
-<b>3. Основание:</b> добровольное согласие (ст. 6, 9 ФЗ № 152-ФЗ «О персональных данных»).<br><br>
-<b>4. Хранение:</b> данные хранятся до 3 лет с момента последней активности или до отзыва согласия.<br><br>
-<b>5. Права:</b> Вы вправе в любой момент отозвать согласие, написав в <a href="https://t.me/MilovskayaDR" class="consent-link">@MilovskayaDR</a>.<br><br>
-<b>6. Передача третьим лицам:</b> данные не передаются и не продаются.<br><br>
-<i>Дата вступления в силу: 19 мая 2026 г.</i>
+const FULL_POLICY_TEXT = `
+  <b>1. Общие положения</b><br>
+  Настоящая Политика обработки персональных данных составлена в соответствии с требованиями Федерального закона от 27.07.2006 № 152-ФЗ «О персональных данных» и определяет порядок обработки данных, предпринимаемый Администрацией клиники FGF Medical (Оператор) для модуля Telegram Mini App «Карта кожи по методу Миловской».<br><br>
+  
+  <b>2. Собираемые данные</b><br>
+  В рамках работы программного модуля сохраняются и подлежат обработке: предоставленное Пользователем имя (или текстовый псевдоним), уникальный Telegram ID учетной записи, возрастная подгруппа и выбранные варианты ответов аналитического квиза. Все указанные данные обрабатываются в обезличенном виде исключительно с целью выдачи персонализированной карты ухода.<br><br>
+  
+  <b>3. Безопасность и третьи лица</b><br>
+  Оператор принимает все необходимые организационные и технические меры для защиты персональных данных Пользователя от неправомерного доступа. Данные шифруются, хранятся внутри закрытого контура автоматизации клиники и никогда, ни при каких условиях не передаются, не продаются и не раскрываются третьим сторонам, за исключением прямых требований законодательства РФ.<br><br>
+  
+  <b>4. Сроки и отзыв согласия</b><br>
+  Данные хранятся в течение 3 лет с момента прохождения теста для обеспечения возможности ведения истории обращений. Субъект персональных данных имеет право в любой момент отозвать свое согласие и потребовать бесследного удаления информации из базы, направив сообщение главному врачу клиники в Telegram: @MilovskayaDR.
 `;
 
 let S = {
@@ -454,8 +502,8 @@ function bWelcome() {
 function fWelcome() {
   return `
     <button class="btn btn-black" onclick="triggerHaptic('medium'); S.screen='name'; render()">Начать экспресс-тест →</button>
-    <div class="welcome-subtext">Нажимая кнопку, Вы выражаете согласие с
-      <a href="${POLICY_URL}" target="_blank" onclick="event.stopPropagation()">Политикой конфиденциальности</a>
+    <div class="welcome-subtext">Нажимая кнопку, Вы выражаете согласие с 
+      <span onclick="openPolicyInline()">Политикой конфиденциальности</span>
     </div>`;
 }
 
@@ -532,13 +580,13 @@ function bConsent() {
       <p class="consent-sub">Подтвердите согласие для обработки персональных данных и вывода карты кожи</p>
       <div id="cr" class="consent-row ${S.consent?'active':''}">
         <div class="check-box"><span class="check-mark">✓</span></div>
-        <div class="consent-txt">Даю согласие на обработку моих персональных данных согласно
-          <a href="${POLICY_URL}" target="_blank" class="consent-link" onclick="event.stopPropagation()">Политике конфиденциальности</a> и ФЗ № 152-ФЗ
+        <div class="consent-txt">Даю согласие на обработку моих персональных данных согласно 
+          <span class="consent-link" onclick="event.stopPropagation(); openPolicyInline();">Политике конфиденциальности</span> и требованиям ФЗ № 152-ФЗ
         </div>
       </div>
       <div id="cerr" class="err-hint ${S.cerr?'show':''}">Пожалуйста, подтвердите согласие для продолжения</div>
-      <div class="consent-policy-block">
-        ${POLICY_TEXT}
+      <div class="consent-brief-box">
+        <b>Краткое разъяснение ФЗ-152:</b> Ваше имя, диапазон возраста и ответы используются клиникой FGF Medical исключительно конфиденциально для расчета архетипа ухода. Данные никогда не покинут внутреннюю базу клиники.
       </div>
     </div>`;
 }
@@ -611,6 +659,16 @@ function fCTA() {
     <a href="https://t.me/MilovskayaDR" class="btn btn-black" target="_blank" onclick="triggerHaptic('medium')">✍️ Связаться с Ириной напрямую</a>
     <a href="https://t.me/fgf_medical" class="btn btn-outline" target="_blank" onclick="triggerHaptic('light')">📞 Написать координатору клиники</a>
     <button class="btn btn-outline" onclick="triggerHaptic('light'); S.screen='result'; render()">← Посмотреть карту кожи</button>`;
+}
+
+function openPolicyInline() {
+  triggerHaptic('light');
+  document.getElementById('modalBodyContent').innerHTML = FULL_POLICY_TEXT;
+  document.getElementById('policyModal').classList.add('show');
+}
+
+function closePolicyModal() {
+  document.getElementById('policyModal').classList.remove('show');
 }
 
 function bind() {
