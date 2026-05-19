@@ -22,7 +22,7 @@
 color: #2C2C2C !important;
       max-width: 480px;
       margin: 0 auto;
-      padding: 20px 16px 40px;
+      padding: 20px 16px calc(40px + env(safe-area-inset-bottom, 20px));
       min-height: 100vh;
     }
     /* Прогресс-бар */
@@ -184,6 +184,8 @@ color: #2C2C2C !important;
 // ============================================================
 const tg = window.Telegram.WebApp;
 tg.ready();
+tg.setHeaderColor('#F8F6F3');
+tg.setBackgroundColor('#F8F6F3');
 setTimeout(() => { tg.expand(); }, 100);
 
 const userName = (tg.initDataUnsafe && tg.initDataUnsafe.user)
