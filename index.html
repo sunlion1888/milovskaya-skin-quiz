@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+<link rel="preload" as="image" href="https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/logo.png">
+<link rel="preload" as="image" href="https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/photo.jpg">
+
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -50,11 +53,13 @@ body { color: var(--black) !important; font-family: 'Inter', -apple-system, sans
 
 /* ТИПОГРАФИКА */
 .cormorant { font-family: 'Cormorant Garamond', Georgia, serif; }
-.welcome-title { font-size: min(30px, 6vh); font-weight: 600; line-height: 1.1; color: var(--black); text-align: center; margin-bottom: 8px; margin-top: 24px; }
+.welcome-title { font-size: min(30px, 6vh); font-weight: 600; line-height: 1.1; color: var(--black); text-align: center; margin-bottom: 8px; }
 .ns-title { font-size: clamp(24px, 5vh, 28px); font-weight: 600; text-align: center; color: var(--black); margin-bottom: 8px; line-height: 1.2; }
 .q-title { font-size: var(--title-quiz); font-weight: 600; line-height: 1.2; color: var(--black); margin-bottom: 4px; }
 
-/* WELCOME SCREEN (ЛОГО УБРАНО) */
+/* WELCOME SCREEN */
+.logo-wrap { text-align: center; padding: 24px 0 16px; flex-shrink: 1; min-height: 0;}
+.logo-img { width: clamp(80px, 15vh, 110px); height: clamp(80px, 15vh, 110px); object-fit: contain; display: block; margin: 0 auto; border-radius: 50%; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
 .welcome-by { font-size: 14px; color: var(--gray); text-align: center; line-height: 1.5; margin-bottom: 24px; }
 .method-note { font-size: 10px; color: #999; text-align: center; line-height: 1.4; margin-bottom: 20px; padding: 0 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 20px; }
@@ -102,10 +107,10 @@ body { color: var(--black) !important; font-family: 'Inter', -apple-system, sans
 .consent-txt { font-size: 13.5px; color: var(--black); line-height: 1.6; }
 .consent-link { color: var(--gray); text-decoration: underline; cursor: pointer; }
 
-/* LOADING С CSS СПИННЕРОМ ВМЕСТО ЛОГОТИПА */
+/* LOADING */
 .loading-full { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #FFFFFF; text-align: center; padding: 30px; }
-.css-spinner { width: 48px; height: 48px; border: 3px solid var(--gray-light); border-top: 3px solid var(--black); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.loading-logo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 24px; animation: premiumPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+@keyframes premiumPulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
 .loading-title { font-size: 22px; font-weight: 600; color: var(--black); margin-bottom: 10px; }
 
 /* RESULTS (360 DEGREES) */
@@ -124,12 +129,6 @@ body { color: var(--black) !important; font-family: 'Inter', -apple-system, sans
 .r-li:last-child { margin-bottom: 0; }
 
 .nutri-tag { display: inline-block; background: var(--gray-light); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; margin: 0 4px 6px 0; border: 1px solid var(--border); }
-
-/* БЛОК ДЛЯ ИРИНЫ */
-.audit-block { background: #FFF9EE; border-left: 3px solid var(--gold); border-radius: var(--r-sm); padding: 16px; margin-top: 30px; margin-bottom: 16px; text-align: center; }
-.audit-title { font-size: 15px; font-weight: 700; color: #7C4F00; margin-bottom: 8px; }
-.audit-desc { font-size: 13px; color: #555; margin-bottom: 16px; line-height: 1.5; }
-
 .fine-print { font-size: 11px; color: #AAAAAA; text-align: center; line-height: 1.5; margin-top: 10px; }
 
 /* MODAL */
@@ -188,32 +187,145 @@ function triggerHaptic(type = 'light') {
   } catch(e) {}
 }
 
+const PHOTO_URL  = 'https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/photo.jpg';
+
+// НОВАЯ МЕТОДОЛОГИЯ БАУМАННА (12 вопросов)
 const Q = [
-  { title: "Как выглядит ваша кожа утром, когда вы просыпаетесь?", hint: "Сразу после пробуждения", opts:[ {t:"Матовая, комфортная, без блеска", s:{T5:2, T2:1}}, {t:"Слегка блестит в Т-зоне (нос, лоб)", s:{T1:1, T5:1}}, {t:"Сильно блестит по всему лицу", s:{T1:3}}, {t:"Ощущается стянутой и сухой", s:{T2:3, T4:1}} ]},
-  { title: "Что происходит через 30 минут после умывания без крема?", hint: "Оценка гидролипидной мантии", opts:[ {t:"Ощущение сильной стянутости, хочется нанести крем", s:{T2:3, T4:1}}, {t:"Комфортно, стянутости нет", s:{T5:2}}, {t:"Кожа начинает жирниться и блестеть", s:{T1:3}}, {t:"Появляются покраснения или дискомфорт", s:{T4:2, T2:1}} ]},
-  { title: "Как выглядят ваши поры?", hint: "В зеркале при дневном свете", opts:[ {t:"Практически незаметны", s:{T2:1, T5:1}}, {t:"Расширенные только в Т-зоне", s:{T1:1, T5:1}}, {t:"Расширенные по всему лицу", s:{T1:2}}, {t:"Крупные поры, склонные к черным точкам", s:{T1:3}} ]},
-  { title: "Как часто у вас появляются прыщи или воспаления?", hint: "Акне, закрытые комедоны", opts:[ {t:"Почти никогда", s:{T5:2, T2:1, T4:1}}, {t:"1-2 раза в месяц (зависит от цикла)", s:{T1:1, T5:1}}, {t:"Регулярно, каждую неделю", s:{T1:2, T2:1}}, {t:"Постоянно, это главная проблема", s:{T1:3}} ]},
-  { title: "Как ваша кожа реагирует на новую косметику?", hint: "Чувствительность барьера", opts:[ {t:"Без проблем, принимает всё", s:{T5:2, T1:1}}, {t:"Иногда бывает легкое пощипывание", s:{T5:1, T2:1}}, {t:"Часто краснеет, шелушится или зудит", s:{T2:3}}, {t:"Почти всегда вызывает реакцию или сыпь", s:{T2:4}} ]},
-  { title: "Краснеет ли ваше лицо при смене температур, стрессе, от острого?", hint: "Сосудистая реакция (розацеа/купероз)", opts:[ {t:"Нет, цвет лица стабильный", s:{T5:2, T1:1}}, {t:"Редко, если очень холодно или жарко", s:{T5:1}}, {t:"Да, часто краснею, румянец долго держится", s:{T2:2}}, {t:"Постоянно, есть заметная сосудистая сетка", s:{T2:4}} ]},
-  { title: "Есть ли у вас пигментные пятна или следы от прыщей?", hint: "Работа меланоцитов", opts:[ {t:"Нет, тон ровный", s:{T5:1}}, {t:"Есть легкие веснушки от солнца", s:{T3:1}}, {t:"Заметные темные следы после воспалений", s:{T3:2, T1:1}}, {t:"Выраженные пигментные пятна (мелазма, хлоазма)", s:{T3:4}} ]},
-  { title: "Как бы вы описали тонус и упругость кожи?", hint: "Оценка коллагена", opts:[ {t:"Отличный тонус, кожа плотная", s:{T5:1, T1:1}}, {t:"Начинаю замечать первые изменения (усталый вид)", s:{T4:1, T2:1}}, {t:"Заметны морщинки и снижение упругости", s:{T4:3}}, {t:"Выраженный птоз (овал поплыл), глубокие морщины", s:{T4:4}} ]},
-  { title: "Как ваша кожа реагирует на солнце?", hint: "Склонность к фотоповреждению", opts:[ {t:"Загораю легко, без ожогов", s:{T5:1}}, {t:"Загораю, но могу обгореть", s:{T5:1, T2:1}}, {t:"Сразу краснею и обгораю", s:{T2:2}}, {t:"Сразу появляются пигментные пятна", s:{T3:3}} ]},
-  { title: "Как меняется ваша кожа зимой?", hint: "Реакция на сухой воздух и мороз", opts:[ {t:"Практически не меняется", s:{T1:1, T5:1}}, {t:"Слегка сохнет, нужен крем плотнее", s:{T5:1, T4:1}}, {t:"Сильно сохнет и шелушится", s:{T2:3, T4:1}}, {t:"Становится красной и раздраженной", s:{T2:3}} ]},
-  { title: "Ваш образ жизни (выберите наиболее актуальное сейчас):", hint: "Влияние системных факторов", opts:[ {t:"Много стресса, недосып", s:{T4:1, T2:1, T1:1}}, {t:"Сидячая работа, мало свежего воздуха", s:{T4:1, T1:1}}, {t:"Часто пью кофе/алкоголь, курю", s:{T4:2, T2:1, T3:1}}, {t:"Стараюсь высыпаться и следить за питанием", s:{T5:2}} ]},
-  { title: "Что вас беспокоит больше всего прямо сейчас?", hint: "Ваша главная цель (выбор умножит баллы)", opts:[ {t:"Жирность, расширенные поры, высыпания", s:{T1:6}}, {t:"Сухость, стянутость, шелушение, чувствительность", s:{T2:6}}, {t:"Пигментные пятна, неровный цвет лица", s:{T3:6}}, {t:"Морщины, потеря тонуса и упругости", s:{T4:6}}, {t:"Всё в норме, просто хочу поддержать качество", s:{T5:6}} ]}
+  { title: "Как выглядит ваша кожа утром, когда вы просыпаетесь?", hint: "Сразу после пробуждения",
+    opts:[
+      {t:"Матовая, комфортная, без блеска", s:{T5:2, T2:1}},
+      {t:"Слегка блестит в Т-зоне (нос, лоб)", s:{T1:1, T5:1}},
+      {t:"Сильно блестит по всему лицу", s:{T1:3}},
+      {t:"Ощущается стянутой и сухой", s:{T2:3, T4:1}}
+    ]},
+  { title: "Что происходит через 30 минут после умывания без крема?", hint: "Оценка гидролипидной мантии",
+    opts:[
+      {t:"Ощущение сильной стянутости, хочется нанести крем", s:{T2:3, T4:1}},
+      {t:"Комфортно, стянутости нет", s:{T5:2}},
+      {t:"Кожа начинает жирниться и блестеть", s:{T1:3}},
+      {t:"Появляются покраснения или дискомфорт", s:{T4:2, T2:1}} // Реактивная (T4 в нашей старой, но здесь T2/T4) 
+      // Корректировка: T1(Жирн), T2(Сух/Чувств), T3(Пигмент), T4(Возраст), T5(Норма)
+      // Красные пятна -> T2 (Чувствительная)
+    ]},
+  { title: "Как выглядят ваши поры?", hint: "В зеркале при дневном свете",
+    opts:[
+      {t:"Практически незаметны", s:{T2:1, T5:1}},
+      {t:"Расширенные только в Т-зоне", s:{T1:1, T5:1}},
+      {t:"Расширенные по всему лицу", s:{T1:2}},
+      {t:"Крупные поры, склонные к черным точкам", s:{T1:3}}
+    ]},
+  { title: "Как часто у вас появляются прыщи или воспаления?", hint: "Акне, закрытые комедоны",
+    opts:[
+      {t:"Почти никогда", s:{T5:2, T2:1, T4:1}},
+      {t:"1-2 раза в месяц (зависит от цикла)", s:{T1:1, T5:1}},
+      {t:"Регулярно, каждую неделю", s:{T1:2, T2:1}},
+      {t:"Постоянно, это главная проблема", s:{T1:3}}
+    ]},
+  { title: "Как ваша кожа реагирует на новую косметику?", hint: "Чувствительность барьера",
+    opts:[
+      {t:"Без проблем, принимает всё", s:{T5:2, T1:1}},
+      {t:"Иногда бывает легкое пощипывание", s:{T5:1, T2:1}},
+      {t:"Часто краснеет, шелушится или зудит", s:{T2:3}},
+      {t:"Почти всегда вызывает реакцию или сыпь", s:{T2:4}}
+    ]},
+  { title: "Краснеет ли ваше лицо при смене температур, стрессе, от острого?", hint: "Сосудистая реакция (розацеа/купероз)",
+    opts:[
+      {t:"Нет, цвет лица стабильный", s:{T5:2, T1:1}},
+      {t:"Редко, если очень холодно или жарко", s:{T5:1}},
+      {t:"Да, часто краснею, румянец долго держится", s:{T2:2}},
+      {t:"Постоянно, есть заметная сосудистая сетка", s:{T2:4}}
+    ]},
+  { title: "Есть ли у вас пигментные пятна или следы от прыщей?", hint: "Работа меланоцитов",
+    opts:[
+      {t:"Нет, тон ровный", s:{T5:1}},
+      {t:"Есть легкие веснушки от солнца", s:{T3:1}},
+      {t:"Заметные темные следы после воспалений", s:{T3:2, T1:1}},
+      {t:"Выраженные пигментные пятна (мелазма, хлоазма)", s:{T3:4}}
+    ]},
+  { title: "Как бы вы описали тонус и упругость кожи?", hint: "Оценка коллагена",
+    opts:[
+      {t:"Отличный тонус, кожа плотная", s:{T5:1, T1:1}},
+      {t:"Начинаю замечать первые изменения (усталый вид)", s:{T4:1, T2:1}},
+      {t:"Заметны морщинки и снижение упругости", s:{T4:3}},
+      {t:"Выраженный птоз (овал поплыл), глубокие морщины", s:{T4:4}}
+    ]},
+  { title: "Как ваша кожа реагирует на солнце?", hint: "Склонность к фотоповреждению",
+    opts:[
+      {t:"Загораю легко, без ожогов", s:{T5:1}},
+      {t:"Загораю, но могу обгореть", s:{T5:1, T2:1}},
+      {t:"Сразу краснею и обгораю", s:{T2:2}},
+      {t:"Сразу появляются пигментные пятна", s:{T3:3}}
+    ]},
+  { title: "Как меняется ваша кожа зимой?", hint: "Реакция на сухой воздух и мороз",
+    opts:[
+      {t:"Практически не меняется", s:{T1:1, T5:1}},
+      {t:"Слегка сохнет, нужен крем плотнее", s:{T5:1, T4:1}},
+      {t:"Сильно сохнет и шелушится", s:{T2:3, T4:1}},
+      {t:"Становится красной и раздраженной", s:{T2:3}}
+    ]},
+  { title: "Ваш образ жизни (выберите наиболее актуальное сейчас):", hint: "Влияние системных факторов",
+    opts:[
+      {t:"Много стресса, недосып", s:{T4:1, T2:1, T1:1}},
+      {t:"Сидячая работа, мало свежего воздуха", s:{T4:1, T1:1}},
+      {t:"Часто пью кофе/алкоголь, курю", s:{T4:2, T2:1, T3:1}},
+      {t:"Стараюсь высыпаться и следить за питанием", s:{T5:2}}
+    ]},
+  { title: "Что вас беспокоит больше всего прямо сейчас?", hint: "Ваша главная цель (выбор умножит баллы)",
+    opts:[
+      {t:"Жирность, расширенные поры, высыпания", s:{T1:6}},
+      {t:"Сухость, стянутость, шелушение, чувствительность", s:{T2:6}},
+      {t:"Пигментные пятна, неровный цвет лица", s:{T3:6}},
+      {t:"Морщины, потеря тонуса и упругости", s:{T4:6}},
+      {t:"Всё в норме, просто хочу поддержать качество", s:{T5:6}}
+    ]}
 ];
 
+// ТИПЫ РЕЗУЛЬТАТОВ ПО БАУМАННУ
 const TYPES = {
-  T1: { name: "Жирная / Смешанная", emoji: "🌊", desc: "Ваш тип характеризуется активной работой сальных желез. Это защищает от ранних морщин, но провоцирует блеск, расширенные поры и склонность к комедонам.", procs: ["Химический пилинг (AHA/BHA)", "Профессиональная чистка лица", "Маски с каолином и нормализующими активами"], tests: ["Тестостерон, ДГЭА-С, ЛГ/ФСГ (исключение гормонального фактора)", "Инсулин, глюкоза, HOMA-индекс (инсулинорезистентность)", "Общий анализ крови, ферритин"], nutri: ["Цинк (25–50 мг/сут)", "Витамин D (коррекция по анализу)", "Омега-3 (противовоспалительное)"] },
-  T2: { name: "Сухая / Чувствительная", emoji: "🏜️", desc: "Ваша кожа имеет истонченный гидролипидный барьер. Она быстро теряет влагу, остро реагирует на перепады температур и новую косметику.", procs: ["Ферментный / энзимный пилинг", "Процедуры глубокого увлажнения", "Криотерапия (успокоение сосудов)"], tests: ["Ферритин, сывороточное железо", "Витамин D, B12", "Функция щитовидной железы (ТТГ, Т4 св.)"], nutri: ["Витамин Е + С (антиоксиданты)", "Гиалуроновая кислота (внутрь)", "Омега-3 (для липидного барьера)"] },
-  T3: { name: "Пигментированная", emoji: "🌑", desc: "В вашей коже меланоциты работают избыточно активно. Главная задача — контроль пигмента, выравнивание тона и строгая защита от УФ.", procs: ["Химический пилинг (ретиноловый, ТСА)", "Маски с азелаиновой кислотой и ниацинамидом", "Обязательно: SPF 50 ежедневно"], tests: ["Половые гормоны (эстрадиол, прогестерон)", "Витамин B12, фолаты", "УЗИ яичников, Гомоцистеин"], nutri: ["Витамин С (1000 мг/сут)", "Ниацинамид (системно)", "Глутатион (осветление изнутри)"] },
-  T4: { name: "Возрастная / Антиэйдж", emoji: "⏳", desc: "Кожа находится в стадии снижения синтеза коллагена и эластина. Фокус ухода смещается на мощную стимуляцию, восполнение объемов и борьбу с гравитационным птозом.", procs: ["Ретиноловые пилинги", "Пептидные программы стимуляции", "IV-терапия (нутрицевтические капельницы)"], tests: ["Половые гормоны (E2, тестостерон, DHEA)", "ИФР-1 (соматотропная функция)", "Ферритин, Витамин D, АМГ"], nutri: ["Коэнзим Q10 (энергия клеток)", "Коллаген I/III типа + Витамин С", "Магний глицинат (стресс, тонус сосудов)"] },
-  T5: { name: "Нормальная / Профилактика", emoji: "🌸", desc: "Ваша кожа в отличном состоянии. Главная задача сейчас — грамотно сохранить этот ресурс, обеспечить базовую защиту и профилактику старения.", procs: ["Базовые уходовые программы", "Легкие увлажняющие маски", "SPF-защита в активное солнце"], tests: ["Общий анализ крови", "Ферритин (депо железа)", "Витамин D и ТТГ (базовый чек-ап)"], nutri: ["Витамин D + K2 (база)", "Омега-3 (1–2 г/сут)", "Антиоксидантный комплекс (C, E, цинк)"] }
+  T1: {
+    name: "Жирная / Смешанная", emoji: "🌊",
+    desc: "Ваш тип характеризуется активной работой сальных желез. Это защищает от ранних морщин, но провоцирует блеск, расширенные поры и склонность к комедонам (преобладание O+S по Бауманну).",
+    procs: ["Химический пилинг (AHA/BHA)", "Профессиональная чистка лица", "Маски с каолином и нормализующими активами"],
+    tests: ["Тестостерон, ДГЭА-С, ЛГ/ФСГ (исключение гормонального фактора)", "Инсулин, глюкоза, HOMA-индекс (инсулинорезистентность)", "Общий анализ крови, ферритин"],
+    nutri: ["Цинк (25–50 мг/сут)", "Витамин D (коррекция по анализу)", "Омега-3 (противовоспалительное)"]
+  },
+  T2: {
+    name: "Сухая / Чувствительная", emoji: "🏜️",
+    desc: "Ваша кожа имеет истонченный гидролипидный барьер. Она быстро теряет влагу, остро реагирует на перепады температур и новую косметику (D+S по Бауманну).",
+    procs: ["Ферментный / энзимный пилинг", "Процедуры глубокого увлажнения", "Криотерапия (успокоение сосудов)"],
+    tests: ["Ферритин, сывороточное железо", "Витамин D, B12", "Функция щитовидной железы (ТТГ, Т4 св.)"],
+    nutri: ["Витамин Е + С (антиоксиданты)", "Гиалуроновая кислота (внутрь)", "Омега-3 (для липидного барьера)"]
+  },
+  T3: {
+    name: "Пигментированная", emoji: "🌑",
+    desc: "В вашей коже меланоциты работают избыточно активно. Главная задача — контроль пигмента, выравнивание тона и строгая защита от УФ (P-тип по Бауманну).",
+    procs: ["Химический пилинг (ретиноловый, ТСА)", "Маски с азелаиновой кислотой и ниацинамидом", "Обязательно: SPF 50 ежедневно"],
+    tests: ["Половые гормоны (эстрадиол, прогестерон)", "Витамин B12, фолаты", "УЗИ яичников, Гомоцистеин"],
+    nutri: ["Витамин С (1000 мг/сут)", "Ниацинамид (системно)", "Глутатион (осветление изнутри)"]
+  },
+  T4: {
+    name: "Возрастная / Антиэйдж", emoji: "⏳",
+    desc: "Кожа находится в стадии снижения синтеза коллагена и эластина. Фокус ухода смещается на мощную стимуляцию, восполнение объемов и борьбу с гравитационным птозом (W-тип).",
+    procs: ["Ретиноловые пилинги", "Пептидные программы стимуляции", "IV-терапия (нутрицевтические капельницы)"],
+    tests: ["Половые гормоны (E2, тестостерон, DHEA)", "ИФР-1 (соматотропная функция)", "Ферритин, Витамин D, АМГ"],
+    nutri: ["Коэнзим Q10 (энергия клеток)", "Коллаген I/III типа + Витамин С", "Магний глицинат (стресс, тонус сосудов)"]
+  },
+  T5: {
+    name: "Нормальная / Профилактика", emoji: "🌸",
+    desc: "Ваша кожа в отличном состоянии (ORNT/DRNT). Главная задача сейчас — грамотно сохранить этот ресурс, обеспечить базовую защиту и профилактику старения.",
+    procs: ["Базовые уходовые программы", "Легкие увлажняющие маски", "SPF-защита в активное солнце"],
+    tests: ["Общий анализ крови", "Ферритин (депо железа)", "Витамин D и ТТГ (базовый чек-ап)"],
+    nutri: ["Витамин D + K2 (база)", "Омега-3 (1–2 г/сут)", "Антиоксидантный комплекс (C, E, цинк)"]
+  }
 };
 
 let S = {
-  screen: 'welcome', userName: '', qi: 0, scores: {T1:0, T2:0, T3:0, T4:0, T5:0}, answers: [], sel: null, result: null, consent: false, cerr: false, nerr: false
+  screen: 'welcome',
+  userName: '',
+  qi: 0, scores: {T1:0, T2:0, T3:0, T4:0, T5:0},
+  answers: [], sel: null, result: null, consent: false, cerr: false, nerr: false
 };
+
 const TOTAL_STEPS = Q.length;
 
 function render() {
@@ -222,7 +334,7 @@ function render() {
 
   if(S.screen === 'loading') {
     app.innerHTML = `<div class="loading-full">
-      <div class="css-spinner"></div>
+      <img src="${PHOTO_URL}" class="loading-logo" alt="Анализ...">
       <div class="cormorant loading-title">Синтезирую протокол...</div>
       <div style="font-size:13px; color:var(--gray)">Анализирую биомаркеры 🤍</div>
     </div>`;
@@ -233,7 +345,10 @@ function render() {
   let header = '';
   if(isQuiz) {
     const pct = Math.round(((S.qi + 1) / TOTAL_STEPS) * 100);
-    header = `<div class="top-bar"><div class="pb-outer"><div class="pb-inner" style="width:${pct}%"></div></div><div class="step-txt">${S.qi + 1} / ${TOTAL_STEPS}</div></div>`;
+    header = `<div class="top-bar">
+      <div class="pb-outer"><div class="pb-inner" style="width:${pct}%"></div></div>
+      <div class="step-txt">${S.qi + 1} / ${TOTAL_STEPS}</div>
+    </div>`;
   }
 
   let body = '', foot = '';
@@ -246,22 +361,28 @@ function render() {
 
   app.innerHTML = `${header}<div class="content${isQuiz ? ' quiz-content' : ''}">${body}</div>${foot ? `<div class="bottom">${foot}</div>` : ''}`;
   bind();
+  
   if(S.screen === 'name') { setTimeout(() => document.getElementById('nameInput')?.focus(), 100); }
 }
 
 function bWelcome() {
   const gr = tgName ? `, ${tgName}` : '';
   return `
+    <div class="logo-wrap">
+      <img class="logo-img" src="${PHOTO_URL}" onerror="this.style.display='none'" alt="Ирина Миловская">
+    </div>
     <h1 class="cormorant welcome-title">Карта кожи<br>от Ирины Миловской</h1>
     <p class="welcome-by">Привет${gr}! Я Ирина — ваш личный мини-косметолог 👩‍⚕️<br><br>Давайте за 2 минуты определим клинический тип вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.</p>
-    <div class="method-note">Алгоритм основан на международной классификации Baumann Skin Type System с клинической адаптацией</div>
+    <div class="method-note">Алгоритм основан на международной классификации Baumann Skin Type System (BSTI) с клинической адаптацией</div>
     <div class="stats-row">
       <div class="stat-item"><div class="stat-num">12</div><div class="stat-lbl">вопросов</div></div>
       <div class="stat-item"><div class="stat-num">2</div><div class="stat-lbl">минуты</div></div>
       <div class="stat-item"><div class="stat-num">360°</div><div class="stat-lbl">подход</div></div>
     </div>`;
 }
-function fWelcome() { return `<button class="btn btn-black" onclick="triggerHaptic('medium'); S.screen='prep'; render()">Начать диагностику →</button>`; }
+function fWelcome() {
+  return `<button class="btn btn-black" onclick="triggerHaptic('medium'); S.screen='prep'; render()">Начать диагностику →</button>`;
+}
 
 function bPrep() {
   return `
@@ -269,14 +390,26 @@ function bPrep() {
       <span class="prep-icon">💧</span>
       <h2 class="cormorant ns-title">Правила подготовки</h2>
       <p class="ns-sub">Чтобы алгоритм сработал точно, мы должны оценить истинное состояние вашей гидролипидной мантии.</p>
+      
       <div class="prep-list">
-        <div class="prep-item"><div class="prep-num">1</div><div class="prep-txt">Умойтесь вашим обычным очищающим средством (пенкой или гелем).</div></div>
-        <div class="prep-item"><div class="prep-num">2</div><div class="prep-txt"><b>Не наносите ничего!</b> Ни тоник, ни сыворотку, ни крем.</div></div>
-        <div class="prep-item"><div class="prep-num">3</div><div class="prep-txt">Подождите 30 минут. Прислушайтесь к ощущениям кожи.</div></div>
+        <div class="prep-item">
+          <div class="prep-num">1</div>
+          <div class="prep-txt">Умойтесь вашим обычным очищающим средством (пенкой или гелем).</div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-num">2</div>
+          <div class="prep-txt"><b>Не наносите ничего!</b> Ни тоник, ни сыворотку, ни крем.</div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-num">3</div>
+          <div class="prep-txt">Подождите 30 минут. Прислушайтесь к ощущениям кожи.</div>
+        </div>
       </div>
     </div>`;
 }
-function fPrep() { return `<button class="btn btn-black" onclick="triggerHaptic('light'); S.screen='name'; render()">Я выполнил(а) условия →</button>`; }
+function fPrep() {
+  return `<button class="btn btn-black" onclick="triggerHaptic('light'); S.screen='name'; render()">Я выполнил(а) условия →</button>`;
+}
 
 function bName() {
   return `
@@ -289,15 +422,29 @@ function bName() {
       <div id="nerr" class="err-hint ${S.nerr?'show':''}">Пожалуйста, введите имя (от 2 букв)</div>
     </div>`;
 }
-function fName() { return `<button class="btn btn-black" onclick="submitName()">Перейти к вопросам →</button><button class="btn btn-outline" onclick="triggerHaptic('light'); S.screen='prep'; render()">← Назад</button>`; }
+function fName() {
+  return `
+    <button class="btn btn-black" onclick="submitName()">Перейти к вопросам →</button>
+    <button class="btn btn-outline" onclick="triggerHaptic('light'); S.screen='prep'; render()">← Назад</button>`;
+}
 
 function bQuiz() {
   const q = Q[S.qi];
   return `
-    <div class="q-card"><h2 class="cormorant q-title">${q.title}</h2>${q.hint ? `<p class="q-hint">${q.hint}</p>` : ''}</div>
-    <div class="opts">${q.opts.map((o,i) => `<div class="opt${S.sel===i?' sel':''}" data-i="${i}"><div class="opt-dot"></div><span>${o.t}</span></div>`).join('')}</div>`;
+    <div class="q-card">
+      <h2 class="cormorant q-title">${q.title}</h2>
+      ${q.hint ? `<p class="q-hint">${q.hint}</p>` : ''}
+    </div>
+    <div class="opts">
+      ${q.opts.map((o,i) => `
+        <div class="opt${S.sel===i?' sel':''}" data-i="${i}">
+          <div class="opt-dot"></div><span>${o.t}</span>
+        </div>`).join('')}
+    </div>`;
 }
-function fQuiz() { return `<button class="btn btn-black" ${S.sel===null?'disabled':''} onclick="nextQ()">Далее →</button>`; }
+function fQuiz() {
+  return `<button class="btn btn-black" ${S.sel===null?'disabled':''} onclick="nextQ()">Далее →</button>`;
+}
 
 function bConsent() {
   const nameGreet = S.userName ? `, ${S.userName.trim()}` : '';
@@ -313,7 +460,9 @@ function bConsent() {
       <div id="cerr" class="err-hint ${S.cerr?'show':''}">Необходимо согласие для продолжения</div>
     </div>`;
 }
-function fConsent() { return `<button class="btn btn-black" onclick="submitConsent()">Сформировать мой протокол 🎯</button>`; }
+function fConsent() {
+  return `<button class="btn btn-black" onclick="submitConsent()">Сформировать мой протокол 🎯</button>`;
+}
 
 function bResult() {
   const t = TYPES[S.result];
@@ -328,23 +477,27 @@ function bResult() {
 
       <div class="r-section">
         <div class="r-title">💉 Косметология (Клинический этап)</div>
-        <div class="r-card"><ul class="r-ul">${t.procs.map(p => `<li class="r-li">${p}</li>`).join('')}</ul></div>
+        <div class="r-card">
+          <ul class="r-ul">
+            ${t.procs.map(p => `<li class="r-li">${p}</li>`).join('')}
+          </ul>
+        </div>
       </div>
 
       <div class="r-section">
         <div class="r-title">🧪 Check-Up (Лабораторный контроль)</div>
-        <div class="r-card" style="background: #FAFAFA;"><ul class="r-ul">${t.tests.map(c => `<li class="r-li">${c}</li>`).join('')}</ul></div>
+        <div class="r-card" style="background: #FAFAFA;">
+          <ul class="r-ul">
+            ${t.tests.map(c => `<li class="r-li">${c}</li>`).join('')}
+          </ul>
+        </div>
       </div>
 
       <div class="r-section">
         <div class="r-title">💊 Нутрицевтическая поддержка</div>
-        <div style="margin-top: 8px;">${t.nutri.map(n => `<span class="nutri-tag">${n}</span>`).join('')}</div>
-      </div>
-      
-      <div class="audit-block">
-        <div class="audit-title">Ирина Игоревна, утвердите концепцию</div>
-        <div class="audit-desc">Нажмите кнопку ниже, чтобы запросить файл аудита в формате .docx для проверки логики.</div>
-        <button class="btn btn-outline-dark" onclick="triggerHaptic('medium'); openBotLink('get_audit_docx')">📥 Скачать аудит (DOCX)</button>
+        <div style="margin-top: 8px;">
+          ${t.nutri.map(n => `<span class="nutri-tag">${n}</span>`).join('')}
+        </div>
       </div>
 
       <div class="fine-print">Данный протокол носит информационный характер и требует клинического подтверждения на очной консультации врача-косметолога.</div>
@@ -358,8 +511,11 @@ function fResult() {
     `;
 }
 
+// УТИЛИТЫ И ЛОГИКА
 function bind() {
-  document.querySelectorAll('.opt').forEach(el => { el.addEventListener('click', () => { triggerHaptic('light'); S.sel = +el.dataset.i; render(); }); });
+  document.querySelectorAll('.opt').forEach(el => {
+    el.addEventListener('click', () => { triggerHaptic('light'); S.sel = +el.dataset.i; render(); });
+  });
   const cr = document.getElementById('cr');
   if(cr) cr.addEventListener('click', () => { triggerHaptic('light'); S.consent = !S.consent; S.cerr = false; render(); });
   const ni = document.getElementById('nameInput');
@@ -378,7 +534,8 @@ function nextQ() {
   const o = Q[S.qi].opts[S.sel];
   for(const [k, v] of Object.entries(o.s)) S.scores[k] += v;
   S.answers.push(S.sel); S.sel = null;
-  if(S.qi < Q.length - 1) { S.qi++; render(); } else { S.screen = 'consent'; render(); }
+  if(S.qi < Q.length - 1) { S.qi++; render(); }
+  else { S.screen = 'consent'; render(); }
 }
 
 function submitConsent() {
