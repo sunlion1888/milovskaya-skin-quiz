@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Карта кожи по методу Миловской</title>
-<script src="https://telegram.org/js/telegram-web-app.js" async></script>
-<!-- шрифты: системный стек, без внешних запросов -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -19,13 +20,12 @@
 html { background:#FFFFFF !important; }
 body {
   background:#FFFFFF !important; color:var(--black) !important;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-  min-height:100vh;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  overflow:hidden; height:100vh; height:-webkit-fill-available;
 }
 #app {
   display:flex; flex-direction:column;
-  min-height:100vh;
-  height:100dvh;
+  height:100vh; height:-webkit-fill-available;
   background:#FFFFFF; max-width:480px; margin:0 auto; overflow:hidden;
 }
 
@@ -42,24 +42,22 @@ body {
 /* SCROLL */
 .content {
   flex:1; overflow-y:auto; overflow-x:hidden;
-  -webkit-overflow-scrolling:touch; padding:0 20px 20px;
-  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch; padding:0 20px 16px;
 }
 .content::-webkit-scrollbar { display:none; }
 
 /* BOTTOM */
 .bottom {
   flex-shrink:0; padding:12px 20px;
-  padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+  padding-bottom:calc(12px + var(--sb));
   background:#FFFFFF; border-top:1px solid var(--border);
   display:flex; flex-direction:column; gap:8px;
-  position:sticky; bottom:0; z-index:10;
 }
 
 /* BUTTONS */
 .btn {
   width:100%; padding:15px 20px; border:none; border-radius:var(--r-sm);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif; font-size:15px; font-weight:600;
+  font-family:'Inter',sans-serif; font-size:15px; font-weight:600;
   cursor:pointer; text-align:center; text-decoration:none; display:block;
   transition:opacity 0.15s,transform 0.1s; letter-spacing:0.1px;
 }
@@ -73,7 +71,6 @@ body {
 .logo-wrap { text-align:center; padding:28px 0 16px; }
 .logo-img { width:110px; height:110px; object-fit:contain; display:block; margin:0 auto; }
 .logo-fallback { font-size:72px; line-height:1; }
-.logo-emoji { font-size:88px; line-height:1; text-align:center; }
 .welcome-title { font-size:24px; font-weight:700; line-height:1.25; color:var(--black); text-align:center; margin-bottom:8px; }
 .welcome-by { font-size:13px; color:var(--gray); text-align:center; line-height:1.5; margin-bottom:20px; }
 .stats-row { display:flex; justify-content:center; gap:32px; margin-bottom:24px; }
@@ -113,7 +110,7 @@ body {
 .ns-sub { font-size:14px; color:var(--gray); text-align:center; margin-bottom:28px; line-height:1.5; }
 .input-field {
   width:100%; padding:16px; border:1.5px solid var(--border);
-  border-radius:var(--r-sm); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  border-radius:var(--r-sm); font-family:'Inter',sans-serif;
   font-size:16px; color:var(--black); background:var(--white);
   outline:none; transition:border-color 0.15s;
   -webkit-appearance:none;
@@ -167,9 +164,9 @@ body {
 /* LOADING */
 .loading-full {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  min-height:100vh; height:100dvh; background:#FFFFFF !important; text-align:center; padding:40px;
+  height:100vh; background:#FFFFFF; text-align:center; padding:40px;
 }
-
+.loading-icon { font-size:56px; margin-bottom:24px; animation:blink 1.4s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.05)} }
 .loading-title { font-size:22px; font-weight:700; color:var(--black); margin-bottom:8px; }
 .loading-sub { font-size:14px; color:var(--gray); }
@@ -206,23 +203,14 @@ body {
 <div id="app"></div>
 <script>
 // ── INIT ──
-// Puzzle Bot совместимость
-const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : {
-  ready:()=>{}, expand:()=>{}, setHeaderColor:()=>{}, setBackgroundColor:()=>{},
-  enableClosingConfirmation:()=>{}, sendData:()=>{},
-  initDataUnsafe:{user:{first_name:''}},
-  BackButton:{ show:()=>{}, hide:()=>{}, onClick:()=>{}, offClick:()=>{} },
-  MainButton:{ show:()=>{}, hide:()=>{}, setText:()=>{}, onClick:()=>{} }
-};
-try { tg.ready(); } catch(e){}
-try { tg.setHeaderColor('#FFFFFF'); } catch(e){}
-try { tg.setBackgroundColor('#FFFFFF'); } catch(e){}
-try { tg.expand(); } catch(e){}
-document.documentElement.style.background = '#FFFFFF';
-document.body.style.background = '#FFFFFF';
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.setHeaderColor('#FFFFFF');
+tg.setBackgroundColor('#FFFFFF');
+setTimeout(()=>tg.expand(), 120);
 
-const tgName = (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) ? tg.initDataUnsafe.user.first_name : '';
-// Логотип: emoji 🐋 (логотип встроен)
+const tgName = tg.initDataUnsafe?.user?.first_name || '';
+const LOGO_URL = 'https://raw.githubusercontent.com/lopatin-sun/milovskaya-skin-quiz/main/logo.png';
 
 const AGE_GROUPS = [
   { label: '18–25 лет', value: '18-25' },
@@ -271,7 +259,7 @@ let S = {
   userName:'', ageGroup:'', ageIdx:null,
   qi:0, scores:{K1:0,K2:0,K3:0,K4:0,K5:0,K6:0},
   answers:[], sel:null, result:null,
-  consent:false, cerr:false, nerr:false, consent2:false, cerr2:false
+  consent:false, cerr:false, nerr:false
 };
 
 // Общее число шагов для прогресс-бара: name(1) + age(1) + 10 вопросов = 12
@@ -306,7 +294,6 @@ function render() {
   if(S.screen==='name')   { body=bName();    foot=fName();    }
   if(S.screen==='age')    { body=bAge();     foot=fAge();     }
   if(S.screen==='quiz')   { body=bQuiz();    foot=fQuiz();    }
-  if(S.screen==='pdscreen'){ body=bPDScreen(); foot=fPDScreen(); }
   if(S.screen==='result') { body=bResult();  foot=fResult();  }
   if(S.screen==='cta')    { body=bCTA();     foot=fCTA();     }
 
@@ -320,7 +307,8 @@ function bWelcome() {
   const gr = tgName ? `, ${tgName}` : '';
   return `
     <div class="logo-wrap">
-      <div class="logo-emoji">🐋</div>
+      <img class="logo-img" src="${LOGO_URL}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="">
+      <div class="logo-fallback" style="display:none">🐋</div>
     </div>
     <h1 class="welcome-title">Карта кожи<br>по методу Миловской</h1>
     <p class="welcome-by">Добро пожаловать${gr}!<br>Авторский квиз доктора Ирины Миловской —<br>врача-дерматолога, косметолога FGF Medical</p>
@@ -333,7 +321,7 @@ function bWelcome() {
     <div class="notice">🩺 <strong>Важно:</strong> Квиз является авторским образовательным инструментом. Результат даёт <em>ориентировочное</em> представление о типе кожи и <strong>не является медицинским диагнозом</strong>.</div>
     <div id="cr" class="consent-row ${S.consent?'active':''}">
       <div class="check-box"><span class="check-mark">✓</span></div>
-      <div class="consent-txt">Даю согласие на обработку персональных данных согласно <a class="consent-link" href="https://t.me/MilovskayaDR" target="_blank" onclick="event.stopPropagation()">Политике конфиденциальности</a> и 152-ФЗ</div>
+      <div class="consent-txt">Даю согласие на обработку персональных данных согласно <span class="consent-link">Политике конфиденциальности</span> и 152-ФЗ</div>
     </div>
     <div id="cerr" class="err-hint ${S.cerr?'show':''}">Необходимо подтвердить согласие для продолжения</div>`;
 }
@@ -345,14 +333,14 @@ function fWelcome() {
 function bName() {
   return `
     <div class="name-screen">
-      
+      <span class="ns-emoji">👋</span>
       <h2 class="ns-title">Как Вас зовут?</h2>
       <p class="ns-sub">Ирина обратится к Вам лично<br>в результатах квиза</p>
       <label class="input-label">Ваше имя</label>
       <input id="nameInput" class="input-field" type="text" placeholder="Например: Анна"
         value="${S.userName}" maxlength="40" autocomplete="given-name"
         oninput="S.userName=this.value.trim(); S.nerr=false;">
-      <div id="nerr" class="err-hint ${S.nerr?'show':''}" style="margin-top:6px">Введите имя (минимум 2 символа)</div>
+      <div id="nerr" class="err-hint ${S.nerr?'show':''}" style="margin-top:6px">Пожалуйста, введите Ваше имя</div>
     </div>`;
 }
 function fName() {
@@ -366,7 +354,7 @@ function bAge() {
   const name = S.userName || 'Вас';
   return `
     <div class="name-screen">
-      
+      <span class="ns-emoji">🎂</span>
       <h2 class="ns-title">Сколько Вам лет,<br>${S.userName || ''}?</h2>
       <p class="ns-sub">Возраст влияет на тип кожи<br>и рекомендации Ирины</p>
       <div class="age-opts">
@@ -389,6 +377,7 @@ function bQuiz() {
   const q = Q[S.qi];
   return `
     <div class="q-card">
+      <span class="q-emoji">${q.emoji}</span>
       <h2 class="q-title">${q.title}</h2>
       ${q.hint?`<p class="q-hint">${q.hint}</p>`:''}
     </div>
@@ -408,35 +397,11 @@ function fQuiz() {
 
 // ── LOADING ──
 function renderLoading() {
-  return `<div class="loading-full" style="background:#FFFFFF !important">
-    <div class="loading-title" style="margin-top:0">Анализирую Вашу кожу...</div>
+  return `<div class="loading-full">
+    <div class="loading-icon">🔬</div>
+    <div class="loading-title">Анализирую Вашу кожу...</div>
     <div class="loading-sub">Составляю Вашу карту кожи 🤍</div>
   </div>`;
-}
-
-
-// ── СОГЛАСИЕ НА ОБР. ДАННЫХ (после теста) ──
-function bPDScreen() {
-  return `
-    <div class="name-screen" style="text-align:center">
-      <div style="font-size:72px;margin-bottom:16px">📋</div>
-      <h2 class="ns-title">Согласие на обработку данных</h2>
-      <p class="ns-sub" style="margin-bottom:24px">Обязательное поле</p>
-      <div id="cr2" class="consent-row${S.consent2?' active':''}" style="text-align:left">
-        <div class="check-box"><span class="check-mark">✓</span></div>
-        <div class="consent-txt">Даю согласие на обработку персональных данных. Нажимая на чекбокс, вы соглашаетесь с <a class="consent-link" href="https://t.me/MilovskayaDR" target="_blank" onclick="event.stopPropagation()">политикой обработки персональных данных</a></div>
-      </div>
-      <div id="cerr2" class="err-hint${S.cerr2?' show':''}" style="margin-top:6px">Необходимо подтвердить согласие</div>
-    </div>`;
-}
-function fPDScreen() {
-  return `
-    <button class="btn btn-black" onclick="submitPD()">Далее →</button>
-    <button class="btn btn-outline" onclick="goBack()">← Назад</button>`;
-}
-function submitPD() {
-  if(!S.consent2){ S.cerr2=true; render(); return; }
-  S.screen='result'; render();
 }
 
 // ── RESULT ──
@@ -445,6 +410,7 @@ function bResult() {
   const nameGreet = S.userName ? `, ${S.userName}` : '';
   return `
     <div class="result-top">
+      <span class="res-emoji">${a.emoji}</span>
       <div class="res-tag">Архетип по методу Миловской</div>
       <h2 class="res-name">${a.name}</h2>
       <p class="res-desc">${a.desc}</p>
@@ -471,7 +437,7 @@ function bCTA() {
     <div class="doctor-section">
       <div class="doc-avatar-ph">👩‍⚕️</div>
       <div class="doc-name">Ирина Миловская</div>
-      <div class="doc-pos">Врач косметолог-дерматолог<br>Главный врач клиники FGF Medical</div>
+      <div class="doc-pos">Врач-дерматолог, косметолог<br>Главный врач FGF Medical</div>
       <div class="info-card">
         <div class="info-line"><span class="info-ic">🏥</span><span>FGF Medical, Санкт-Петербург</span></div>
         <div class="info-line"><span class="info-ic">📅</span><span>Чт, Пт, Вс · 10:00–21:00</span></div>
@@ -496,14 +462,8 @@ function bind() {
   });
   const cr = document.getElementById('cr');
   if(cr) cr.addEventListener('click',()=>{ S.consent=!S.consent; S.cerr=false; render(); });
-  const cr2 = document.getElementById('cr2');
-  if(cr2) cr2.addEventListener('click',()=>{ S.consent2=!S.consent2; S.cerr2=false; render(); });
   const ni = document.getElementById('nameInput');
-  if(ni) {
-    ni.addEventListener('input',()=>{ S.userName=ni.value.trim(); S.nerr=false; });
-    ni.addEventListener('focus',()=>{ setTimeout(()=>{ ni.scrollIntoView({block:'center',behavior:'smooth'}); },300); });
-    setTimeout(()=>ni.focus(), 100);
-  }
+  if(ni) { ni.focus(); ni.addEventListener('input',()=>{ S.userName=ni.value.trim(); S.nerr=false; }); }
 }
 
 // ── LOGIC ──
@@ -512,7 +472,7 @@ function startFlow() {
   S.screen='name'; render();
 }
 function submitName() {
-  if(!S.userName || S.userName.length < 2){ S.nerr=true; render(); return; }
+  if(!S.userName){ S.nerr=true; render(); return; }
   S.screen='age'; render();
 }
 function submitAge() {
@@ -538,15 +498,14 @@ function goBack() {
     } else { S.screen='age'; render(); }
     return;
   }
-  if(S.screen==='pdscreen'){ S.screen='quiz'; S.qi=Q.length-1; S.sel=S.answers[S.answers.length-1]||null; render(); return; }
   if(S.screen==='cta')  { S.screen='result'; render(); }
 }
 function calcResult() {
   let max=0, win='K1';
   for(const[k,v] of Object.entries(S.scores)) if(v>max){max=v;win=k;}
-  S.result=win; S.screen='pdscreen';
+  S.result=win; S.screen='result';
   try{
-    try { tg.sendData(JSON.stringify({
+    tg.sendData(JSON.stringify({
       archetype:win, archetype_name:A[win].name,
       scores:S.scores, user_name:S.userName,
       age_group:S.ageGroup, quiz_completed:true
@@ -558,16 +517,19 @@ function goCTA(){ S.screen='cta'; render(); }
 function reset(){
   S={screen:'welcome',userName:'',ageGroup:'',ageIdx:null,qi:0,
      scores:{K1:0,K2:0,K3:0,K4:0,K5:0,K6:0},answers:[],sel:null,
-     result:null,consent:false,cerr:false,nerr:false,consent2:false,cerr2:false};
+     result:null,consent:false,cerr:false,nerr:false};
   render();
 }
 
 // ── BACK BUTTON ──
 function updateBack() {
-  try { if(S.screen==='welcome'){ tg.BackButton.hide(); return; } tg.BackButton.show(); tg.BackButton.onClick(()=>goBack()); } catch(e){}
+  if(S.screen==='welcome'){ tg.BackButton.hide(); return; }
+  tg.BackButton.show();
+  tg.BackButton.onClick(()=>goBack());
 }
 
 render();
 </script>
 </body>
 </html>
+
