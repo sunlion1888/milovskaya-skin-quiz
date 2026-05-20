@@ -31,16 +31,17 @@ function bWelcome() {
   const greeting = gr ? `, ${gr}` : '';
   return `
     <div class="logo-wrap">
-      <img class="logo-img" src="${PHOTO_URL}" onerror="this.style.display='none'" alt="Ирина Миловская">
+      <img class="logo-img" src="${LOGO_URL}" onerror="this.style.display='none'" alt="Ирина Миловская">
     </div>
     <h1 class="cormorant welcome-title">Карта кожи<br>от Ирины Миловской</h1>
-    <p class="welcome-by">Привет${greeting}! Я Ирина — ваш личный мини-косметолог 👩‍⚕️<br><br>Давайте за 2 минуты определим клинический тип вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.</p>
+    <p class="welcome-by">Привет${greeting}!<br>Я Ирина — ваш личный косметолог 👩‍⚕️<br><br>Давайте за 2 минуты определим клинический тип вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.</p>
     <div class="method-note">Алгоритм основан на международной классификации Baumann Skin Type System (BSTI) с клинической адаптацией</div>
     <div class="stats-row">
       <div class="stat-item"><div class="stat-num">12</div><div class="stat-lbl">вопросов</div></div>
       <div class="stat-item"><div class="stat-num">2</div><div class="stat-lbl">минуты</div></div>
       <div class="stat-item"><div class="stat-num">360°</div><div class="stat-lbl">подход</div></div>
-    </div>`;
+    </div>
+    <div class="method-note" style="margin-top: 8px;">⚠️ Квиз — авторский образовательный инструмент. Результат носит ознакомительный характер и не является медицинским диагнозом.</div>`;
 }
 
 function fWelcome() {
@@ -81,7 +82,7 @@ function bName() {
       <h2 class="cormorant ns-title">Как к Вам обращаться?</h2>
       <p class="ns-sub">Я сформирую именной протокол, который вы сможете скачать в формате PDF.</p>
       <label class="input-label">Ваше имя</label>
-      <input id="nameInput" class="input-field" type="text" placeholder="Например: Екатерина" value="${S.userName}" maxlength="30" oninput="S.userName=this.value; S.nerr=false; document.getElementById('nerr').classList.remove('show');">
+      <input id="nameInput" class="input-field" type="text" placeholder="Например: Ирина" value="${S.userName}" maxlength="30" oninput="S.userName=this.value; S.nerr=false; document.getElementById('nerr').classList.remove('show');">
       <div id="nerr" class="err-hint ${S.nerr?'show':''}">Пожалуйста, введите имя (от 2 букв)</div>
     </div>`;
 }
@@ -142,7 +143,7 @@ function bResult() {
       </div>
 
       <div class="r-section">
-        <div class="r-title">💉 Косметология (Клинический этап)</div>
+        <div class="r-title">💉 Рекомендованные процедуры</div>
         <div class="r-card">
           <ul class="r-ul">
             ${t.procs.map(p => `<li class="r-li">${p}</li>`).join('')}
@@ -151,7 +152,7 @@ function bResult() {
       </div>
 
       <div class="r-section">
-        <div class="r-title">🧪 Check-Up (Лабораторный контроль)</div>
+        <div class="r-title">🧪 Лабораторный Check-Up</div>
         <div class="r-card" style="background: #FAFAFA;">
           <ul class="r-ul">
             ${t.tests.map(c => `<li class="r-li">${c}</li>`).join('')}
@@ -177,7 +178,6 @@ function fResult() {
     `;
 }
 
-// Заглушка для экрана "Запись к Ирине" (позже добавим полноценный)
 function bBooking() {
   return `<div class="name-screen"><h2 class="cormorant ns-title">Запись к Ирине</h2><p>Здесь будет форма записи</p></div>`;
 }
@@ -185,7 +185,7 @@ function fBooking() {
   return `<button class="btn btn-outline" onclick="navigateTo('result')">← Назад к протоколу</button>`;
 }
 
-// Вспомогательные функции навигации (пока оставлены здесь, потом перенесем в render.js)
+// Вспомогательные функции навигации
 function submitName() {
   const c = (S.userName || '').trim();
   if(c.length < 2) { S.nerr = true; render(); triggerHaptic('warning'); return; }

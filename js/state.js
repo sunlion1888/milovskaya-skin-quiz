@@ -16,4 +16,4 @@ let S = {
   nerr: false
 };
 
-const TOTAL_STEPS = 12; // будет переопределено из quizData.js после загрузки Q.length
+let TOTAL_STEPS = 12; // будет переопределено после загрузки quizData

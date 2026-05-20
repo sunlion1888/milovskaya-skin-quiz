@@ -4,7 +4,7 @@ function render() {
 
   if(S.screen === 'loading') {
     app.innerHTML = `<div class="loading-full">
-      <img src="${PHOTO_URL}" class="loading-logo" alt="Анализ...">
+      <img src="${LOGO_URL}" class="loading-logo" alt="Анализ...">
       <div class="cormorant loading-title">Синтезирую протокол...</div>
       <div style="font-size:13px; color:var(--gray)">Анализирую биомаркеры 🤍</div>
     </div>`;
