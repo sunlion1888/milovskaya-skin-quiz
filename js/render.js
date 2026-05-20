@@ -1,61 +1,52 @@
-let appHeader, appContent, appFooter;
-function initContainers() {
+function render() {
   const app = document.getElementById('app');
   app.innerHTML = '';
-  appHeader = document.createElement('header');
-  appHeader.id = 'appHeader';
-  appContent = document.createElement('main');
-  appContent.id = 'appContent';
-  appContent.className = 'content';
-  appFooter = document.createElement('footer');
-  appFooter.id = 'appFooter';
-  appFooter.className = 'bottom';
-  app.append(appHeader, appContent, appFooter);
-}
 
-function render() {
-  if (!appHeader) initContainers();
-
-  if (S.screen === 'loading') {
-    appHeader.innerHTML = '';
-    appContent.innerHTML = '';
-    appContent.classList.remove('quiz-content');
-    appContent.appendChild(buildLoadingScreen());
-    appFooter.innerHTML = '';
+  if(S.screen === 'loading') {
+    app.innerHTML = `<div class="loading-full">
+      <img src="${PHOTO_URL}" class="loading-logo" alt="Анализ...">
+      <div class="cormorant loading-title">Синтезирую протокол...</div>
+      <div style="font-size:13px; color:var(--gray)">Анализирую биомаркеры 🤍</div>
+    </div>`;
     return;
   }
 
-  if (S.screen === 'quiz') {
+  const isQuiz = S.screen === 'quiz';
+  let header = '';
+  if(isQuiz) {
     const pct = Math.round(((S.qi + 1) / Q.length) * 100);
-    appHeader.innerHTML = `<div class="top-bar"><div class="pb-outer"><div class="pb-inner" style="width:${pct}%"></div></div><div class="step-txt">${S.qi+1}/${Q.length}</div></div>`;
-    appContent.classList.add('quiz-content');
-    appContent.innerHTML = '';
-    appContent.appendChild(buildQuizContent());
-    appFooter.innerHTML = '';
-    appFooter.appendChild(buildQuizFooter());
-    if (window.innerWidth > 768) {
-      setTimeout(() => { const firstOpt = document.querySelector('.opt'); if (firstOpt) firstOpt.focus(); }, 100);
-    }
-    return;
-  } else {
-    appHeader.innerHTML = '';
-    appContent.classList.remove('quiz-content');
+    header = `<div class="top-bar">
+      <div class="pb-outer"><div class="pb-inner" style="width:${pct}%"></div></div>
+      <div class="step-txt">${S.qi + 1} / ${Q.length}</div>
+    </div>`;
   }
 
-  appContent.innerHTML = '';
-  appFooter.innerHTML = '';
-  switch (S.screen) {
-    case 'welcome': appContent.appendChild(buildWelcomeContent()); appFooter.appendChild(buildWelcomeFooter()); break;
-    case 'science': appContent.appendChild(buildScienceContent()); appFooter.appendChild(buildScienceFooter()); break;
-    case 'prep': appContent.appendChild(buildPrepContent()); appFooter.appendChild(buildPrepFooter()); break;
-    case 'name': appContent.appendChild(buildNameContent()); appFooter.appendChild(buildNameFooter()); setTimeout(() => document.getElementById('nameInput')?.focus(), 100); break;
-    case 'consent': appContent.appendChild(buildConsentContent()); appFooter.appendChild(buildConsentFooter()); break;
-    case 'result': appContent.appendChild(buildResultContent()); appFooter.appendChild(buildResultFooter()); break;
-    case 'booking': appContent.appendChild(buildBookingContent()); appFooter.appendChild(buildBookingFooter()); break;
-  }
+  let body = '', foot = '';
+  if(S.screen === 'welcome') { body = bWelcome(); foot = fWelcome(); }
+  else if(S.screen === 'prep')    { body = bPrep();    foot = fPrep();    }
+  else if(S.screen === 'name')    { body = bName();    foot = fName();    }
+  else if(S.screen === 'quiz')    { body = bQuiz();    foot = fQuiz();    }
+  else if(S.screen === 'consent') { body = bConsent(); foot = fConsent(); }
+  else if(S.screen === 'result')  { body = bResult();  foot = fResult();  }
+  else if(S.screen === 'booking') { body = bBooking(); foot = fBooking(); }
+
+  app.innerHTML = `${header}<div class="content${isQuiz ? ' quiz-content' : ''}">${body}</div>${foot ? `<div class="bottom">${foot}</div>` : ''}`;
+  bind();
+  
+  if(S.screen === 'name') { setTimeout(() => document.getElementById('nameInput')?.focus(), 100); }
 }
 
 function navigateTo(screen) {
   S.screen = screen;
   render();
+}
+
+function bind() {
+  document.querySelectorAll('.opt').forEach(el => {
+    el.addEventListener('click', () => { triggerHaptic('light'); S.sel = +el.dataset.i; render(); });
+  });
+  const cr = document.getElementById('cr');
+  if(cr) cr.addEventListener('click', () => { triggerHaptic('light'); S.consent = !S.consent; S.cerr = false; render(); });
+  const ni = document.getElementById('nameInput');
+  if(ni) ni.addEventListener('keydown', e => { if(e.key === 'Enter') submitName(); });
 }
