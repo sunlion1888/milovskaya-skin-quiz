@@ -91,7 +91,7 @@ function bWelcome() {
   const greeting = gr ? `, ${gr}` : '';
   const p = document.createElement('p');
   p.className = 'welcome-by';
-  p.innerHTML = `Привет${greeting}!<br>Я Ирина — ваш личный косметолог 👩‍⚕️<br><br>Давайте за 2 минуты определим клинический тип вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.`;
+  p.innerHTML = `Привет${greeting}!<br>Давайте за 2 минуты определим клинический тип вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.`;
   frag.appendChild(p);
 
   const methodNote = document.createElement('div');
@@ -178,7 +178,7 @@ function bName() {
 
   const sub = document.createElement('p');
   sub.className = 'ns-sub';
-  sub.textContent = 'Я сформирую именной протокол, который вы сможете скачать в формате PDF.';
+  sub.textContent = 'Я сформирую именной протокол, который Вы сможете скачать в формате PDF.';
   wrap.appendChild(sub);
 
   const label = document.createElement('label');
