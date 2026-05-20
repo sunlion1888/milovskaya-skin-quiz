@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Карта кожи | Ирина Миловская</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" as="image" href="https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/logo.png">
+  <link rel="preload" as="image" href="https://raw.githubusercontent.com/sunlion1888/milovskaya-skin-quiz/main/photo.jpg">
+</head>
+<body>
+  <div id="app"></div>
+  <div id="policyModal" class="modal-overlay" onclick="closePolicyModal()">
+    <div class="modal-window" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">Правовая информация</div>
+        <button class="modal-close" onclick="closePolicyModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBodyContent">
+        <b>1. Общие положения</b><br>
+        Политика обработки данных разработана для модуля «Карта кожи».<br><br>
+        <b>2. Собираемые данные</b><br>
+        В рамках теста обрабатываются: ваше имя, Telegram ID и ответы на вопросы для подбора рекомендаций.<br><br>
+        <b>3. Конфиденциальность</b><br>
+        Ваши данные используются исключительно для формирования медицинского протокола и не передаются третьим лицам.<br><br>
+        <b>4. Отзыв согласия</b><br>
+        Вы можете в любой момент отозвать согласие, написав в службу поддержки клиники.
+      </div>
+    </div>
+  </div>
+  <script src="js/state.js"></script>
+  <script src="js/quizData.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
