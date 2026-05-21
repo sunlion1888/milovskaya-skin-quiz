@@ -43,7 +43,6 @@ function renderQuizHeader() {
   pbInner.className = 'pb-inner';
   pbInner.style.width = pct + '%';
 
-  // Эмодзи-индикатор (только с 3-го вопроса)
   if (S.qi >= 2) {
     const leader = getLeadingType();
     if (leader) {
@@ -93,6 +92,7 @@ function getBodyElement(screen) {
 
 function bWelcome() {
   const frag = document.createDocumentFragment();
+
   const logoWrap = document.createElement('div');
   logoWrap.className = 'logo-wrap';
   const img = document.createElement('img');
@@ -108,11 +108,9 @@ function bWelcome() {
   h1.innerHTML = 'Карта кожи<br>от Ирины Миловской';
   frag.appendChild(h1);
 
-  const gr = tg.initDataUnsafe?.user?.first_name || '';
-  const greeting = gr ? `, ${gr}` : '';
   const p = document.createElement('p');
   p.className = 'welcome-by';
-  p.innerHTML = `Привет${greeting}!<br>Давайте за 2 минуты определим клинический тип вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.`;
+  p.textContent = 'Добрый день! Давайте за 2 минуты определим клинический тип Вашей кожи, и я подготовлю персональный протокол ухода и чекап организма.';
   frag.appendChild(p);
 
   const methodNote = document.createElement('div');
@@ -145,9 +143,9 @@ function bPrep() {
   wrap.innerHTML = `
     <span class="prep-icon">💧</span>
     <h2 class="cormorant ns-title">Правила подготовки</h2>
-    <p class="ns-sub">Чтобы алгоритм сработал точно, мы должны оценить истинное состояние вашей гидролипидной мантии.</p>
+    <p class="ns-sub">Чтобы алгоритм сработал точно, мы должны оценить истинное состояние Вашей гидролипидной мантии.</p>
     <div class="prep-list">
-      <div class="prep-item"><div class="prep-num">1</div><div class="prep-txt">Умойтесь вашим обычным очищающим средством (пенкой или гелем).</div></div>
+      <div class="prep-item"><div class="prep-num">1</div><div class="prep-txt">Умойтесь Вашим обычным очищающим средством (пенкой или гелем).</div></div>
       <div class="prep-item"><div class="prep-num">2</div><div class="prep-txt"><b>Не наносите ничего!</b> Ни тоник, ни сыворотку, ни крем.</div></div>
       <div class="prep-item"><div class="prep-num">3</div><div class="prep-txt">Подождите 30 минут. Прислушайтесь к ощущениям кожи.</div></div>
     </div>`;
@@ -170,7 +168,7 @@ function bName() {
   input.className = 'input-field';
   input.type = 'text';
   input.placeholder = 'Например: Ирина';
-  input.value = S.userName;
+  input.value = S.userName;   // пустое после изменений в state
   input.maxLength = 30;
   input.addEventListener('input', () => {
     S.userName = input.value;
@@ -226,16 +224,20 @@ function bConsent() {
   const frag = document.createDocumentFragment();
   const wrap = document.createElement('div');
   wrap.className = 'consent-screen';
-  const nameGreet = S.userName ? `, ${S.userName.trim()}` : '';
   wrap.innerHTML = `
     <span class="prep-icon">📋</span>
-    <h2 class="cormorant ns-title">Финальный шаг${nameGreet}</h2>
-    <p class="consent-sub">Подтвердите согласие для расчета клинического алгоритма</p>
+    <h2 class="cormorant ns-title" style="text-transform: uppercase;">Согласие на обработку персональных данных</h2>
+    <p class="ns-sub" style="font-size:12px; color:var(--gray);">Обязательное поле</p>
     <div id="cr" class="consent-row${S.consent ? ' active' : ''}">
       <div class="check-box"><span class="check-mark">✓</span></div>
-      <div class="consent-txt">Соглашаюсь на обработку данных согласно <span class="consent-link">Политике конфиденциальности</span></div>
+      <div class="consent-txt">Даю согласие на обработку персональных данных</div>
     </div>
-    <div id="cerr" class="err-hint${S.cerr ? ' show' : ''}">Необходимо согласие для продолжения</div>`;
+    <p style="font-size:11px; color:var(--gray); margin-top:6px; line-height:1.5;">
+      Нажимая на чекбокс, Вы соглашаетесь с 
+      <span class="consent-link" style="text-decoration:underline; cursor:pointer;">политикой обработки персональных данных</span>
+    </p>
+    <div id="cerr" class="err-hint${S.cerr ? ' show' : ''}">Необходимо согласие для продолжения</div>
+    <p style="font-size:10px; color:var(--gray); margin-top:4px;">* Обязательный вопрос</p>`;
 
   const cr = wrap.querySelector('#cr');
   const link = wrap.querySelector('.consent-link');
@@ -291,10 +293,11 @@ function bBooking() {
   wrap.innerHTML = `
     <img src="${PHOTO_URL}" alt="Ирина Миловская" style="width:120px;height:120px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 16px;box-shadow:0 8px 24px rgba(0,0,0,0.06);">
     <h2 class="cormorant" style="font-size:24px;font-weight:600;text-align:center;margin-bottom:4px;">Ирина Миловская</h2>
-    <p style="font-size:13px;color:var(--gray);text-align:center;margin-bottom:20px;">Врач-косметолог, дерматолог, главный врач FGF Medical</p>
+    <p style="font-size:13px;color:var(--gray);text-align:center;margin-bottom:4px;">Врач-косметолог, дерматолог</p>
+    <p style="font-size:13px;color:var(--gray);text-align:center;margin-bottom:20px;">Главный врач FGF Medical</p>
     <div style="background:var(--gray-light);border-radius:var(--r);padding:16px;margin-bottom:20px;font-size:13px;line-height:1.6;">
       <p style="margin-bottom:8px;"><b>📍 Адрес:</b><br>Санкт-Петербург, Малый пр. В.О., д. 64, корп. 1, стр. 1, помещение 100-Н<br>(ЖК The Residence, проход со стороны 24-й и 25-й линий В.О.)</p>
-      <p><b>🕒 Приём:</b> четверг, пятница, воскресенье<br>с 10:00 до 21:00</p>
+      <p><b>🕒 Приём:</b> четверг, пятница, воскресенье с 10:00 до 21:00</p>
     </div>`;
   frag.appendChild(wrap);
   return frag;
@@ -324,30 +327,25 @@ function fWelcome() {
 function fPrep() {
   const container = document.createElement('div');
   container.appendChild(createButton('Я выполнил(а) условия →', { cls: 'btn-black', onClick: () => { triggerHaptic('light'); navigateTo('name'); } }));
+  container.appendChild(createButton('← Назад', { cls: 'btn-outline', onClick: () => { triggerHaptic('light'); navigateTo('welcome'); } }));
   return container;
 }
 
 function fName() {
   const container = document.createElement('div');
-  const row = document.createElement('div');
-  row.className = 'bottom-row';
-  row.appendChild(createButton('← Назад', { cls: 'btn-outline', onClick: () => { triggerHaptic('light'); navigateTo('prep'); } }));
-  row.appendChild(createButton('Перейти к вопросам →', { cls: 'btn-black', onClick: submitName }));
-  container.appendChild(row);
+  container.appendChild(createButton('Перейти к вопросам →', { cls: 'btn-black', onClick: submitName }));
+  container.appendChild(createButton('← Назад', { cls: 'btn-outline', onClick: () => { triggerHaptic('light'); navigateTo('prep'); } }));
   return container;
 }
 
 function fQuiz() {
   const container = document.createElement('div');
-  if (S.qi === 0) {
-    container.appendChild(createButton('Далее →', { cls: 'btn-black', onClick: nextQ, disabled: S.sel === null }));
-  } else {
-    const row = document.createElement('div');
-    row.className = 'bottom-row';
-    row.appendChild(createButton('← Назад', { cls: 'btn-outline', onClick: prevQ }));
-    row.appendChild(createButton('Далее →', { cls: 'btn-black', onClick: nextQ, disabled: S.sel === null }));
-    container.appendChild(row);
-  }
+  container.appendChild(createButton('Далее →', { cls: 'btn-black', onClick: nextQ, disabled: S.sel === null }));
+  const backTarget = S.qi === 0 ? 'name' : null; // на первом вопросе назад к имени
+  const backOnClick = S.qi === 0
+    ? () => { triggerHaptic('light'); navigateTo('name'); }
+    : () => prevQ();
+  container.appendChild(createButton('← Назад', { cls: 'btn-outline', onClick: backOnClick }));
   return container;
 }
 
@@ -359,19 +357,27 @@ function fConsent() {
 
 function fResult() {
   const container = document.createElement('div');
+  container.style.gap = '12px';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+
   container.appendChild(createButton('📥 Скачать PDF на устройство', { cls: 'btn-gold', onClick: () => { triggerHaptic('medium'); generateLocalPDF(); } }));
   container.appendChild(createButton('📩 Получить протокол в Telegram', { cls: 'btn-outline-dark', onClick: () => { triggerHaptic('medium'); openBotLink('get_pdf_protocol'); } }));
-  const bookBtn = createButton('✍️ Записаться на диагностику к Ирине', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); navigateTo('booking'); } });
-  bookBtn.style.marginTop = '2px';
-  container.appendChild(bookBtn);
+  container.appendChild(createButton('✍️ Записаться на диагностику к Ирине', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); navigateTo('booking'); } }));
+
   return container;
 }
 
 function fBooking() {
   const container = document.createElement('div');
-  container.appendChild(createButton('Написать в клинику FGF Medical', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); try { tg.openTelegramLink('https://t.me/fgf_medical'); } catch(e) { window.open('https://t.me/fgf_medical', '_blank'); } } }));
-  container.appendChild(createButton('Написать Ирине лично', { cls: 'btn-outline-dark', onClick: () => { triggerHaptic('medium'); try { tg.openTelegramLink('https://t.me/MilovskayaDR'); } catch(e) { window.open('https://t.me/MilovskayaDR', '_blank'); } } }));
+  container.style.gap = '10px';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+
+  container.appendChild(createButton('Написать Ирине лично', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); try { tg.openTelegramLink('https://t.me/MilovskayaDR'); } catch(e) { window.open('https://t.me/MilovskayaDR', '_blank'); } } }));
+  container.appendChild(createButton('Написать администратору', { cls: 'btn-outline-dark', onClick: () => { triggerHaptic('medium'); try { tg.openTelegramLink('https://t.me/fgf_medical'); } catch(e) { window.open('https://t.me/fgf_medical', '_blank'); } } }));
   container.appendChild(createButton('← Назад к протоколу', { cls: 'btn-outline', onClick: () => navigateTo('result') }));
+
   return container;
 }
 
@@ -411,26 +417,23 @@ function prevQ() {
   triggerHaptic('light');
   S.direction = 'backward';
 
-  // Откатываем последний ответ
   const lastSel = S.answers.pop();
   const o = Q[S.qi - 1].opts[lastSel];
   for (const [k, v] of Object.entries(o.s)) S.scores[k] -= v;
 
   S.qi--;
-  S.sel = lastSel;   // восстанавливаем выбор
+  S.sel = lastSel;
   renderWithAnimation();
 }
 
 function renderWithAnimation() {
-  // Добавляем класс анимации на content
   const animClass = S.direction === 'forward' ? 'animate-forward' : 'animate-backward';
   contentEl.classList.add(animClass);
 
-  // После завершения анимации перерисовываем
   setTimeout(() => {
     contentEl.classList.remove(animClass);
     render();
-  }, 300); // 150ms * 2
+  }, 300);
 }
 
 function submitConsent() {
@@ -545,6 +548,14 @@ function generateLocalPDF() {
   doc.setTextColor(100);
   doc.text('Данный протокол носит информационный характер и не является медицинским диагнозом.', pageWidth / 2, y, { align: 'center' });
 
-  const fileName = `Протокол_${S.userName || 'пациент'}_${new Date().toISOString().slice(0,10)}.pdf`;
-  doc.save(fileName);
+  // Вместо прямого doc.save (может не работать в WebApp) создаём Blob и открываем ссылку
+  const pdfBlob = doc.output('blob');
+  const url = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Протокол_${S.userName || 'пациент'}_${new Date().toISOString().slice(0,10)}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
