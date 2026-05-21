@@ -396,10 +396,8 @@ function bResult() {
 }
 
 function bBooking() {
-  const frag = document.createDocumentFragment();
   const wrap = document.createElement('div');
-  wrap.className = 'name-screen';
-  wrap.style.paddingTop = '24px';
+wrap.style.padding = '24px 16px';
 
   // Фото
   const photo = document.createElement('img');
@@ -719,25 +717,20 @@ function renderLoadingScreen() {
   contentEl.appendChild(loadingDiv);
 
   // Анимация прогресса и смена подсказок
-  let progress = 0;
-  const totalTime = 2200; // совпадает с setTimeout в submitConsent
-  const stepTime = totalTime / hints.length;
+let progress = 0;
+const interval = setInterval(() => {
+  progress += 100 / (2200 / 200); // 9.09...% каждые 200 мс, всего 11 шагов
+  if (progress > 100) progress = 100;
+  progressInner.style.width = progress + '%';
 
-  const interval = setInterval(() => {
-    progress += 100 / (totalTime / 200); // шаг каждые 200 мс
-    if (progress > 100) progress = 100;
-    progressInner.style.width = progress + '%';
+  const hintIndex = Math.min(
+    Math.floor(progress / 25), // 25% на подсказку
+    hints.length - 1
+  );
+  hintText.textContent = hints[hintIndex];
 
-    const hintIndex = Math.min(
-      Math.floor(progress / (100 / hints.length)),
-      hints.length - 1
-    );
-    hintText.textContent = hints[hintIndex];
-  }, 200);
-
-  // Очистка интервала при уходе с экрана загрузки (на всякий случай)
-  loadingDiv._interval = interval;
-}
+  if (progress >= 100) clearInterval(interval);
+}, 200);
 
 function generateLocalPDF() {
   const { jsPDF } = window.jspdf;
