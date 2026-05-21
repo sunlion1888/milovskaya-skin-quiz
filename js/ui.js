@@ -396,8 +396,9 @@ function bResult() {
 }
 
 function bBooking() {
+  const frag = document.createDocumentFragment();
   const wrap = document.createElement('div');
-wrap.style.padding = '24px 16px';
+  wrap.style.padding = '24px 16px';
 
   // Фото
   const photo = document.createElement('img');
@@ -660,7 +661,7 @@ function calcResult() {
   navigateTo('result');
 }
 
-// ---------- Экран загрузки (особый, полностью перестраивает #app) ----------
+// ---------- Экран загрузки ----------
 
 function renderLoadingScreen() {
   clearElement(headerEl);
@@ -670,7 +671,7 @@ function renderLoadingScreen() {
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'loading-full';
 
-  // Фото вместо логотипа
+  // Фото
   const img = document.createElement('img');
   img.src = PHOTO_URL;
   img.className = 'loading-logo';
@@ -716,23 +717,29 @@ function renderLoadingScreen() {
 
   contentEl.appendChild(loadingDiv);
 
-  // Анимация прогресса и смена подсказок
-let progress = 0;
-const interval = setInterval(() => {
-  progress += 100 / (2200 / 200); // 9.09...% каждые 200 мс, всего 11 шагов
-  if (progress > 100) progress = 100;
-  progressInner.style.width = progress + '%';
+  // Анимация
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 100 / (2200 / 200);
+    if (progress > 100) progress = 100;
+    progressInner.style.width = progress + '%';
 
-  const hintIndex = Math.min(
-    Math.floor(progress / 25), // 25% на подсказку
-    hints.length - 1
-  );
-  hintText.textContent = hints[hintIndex];
+    const hintIndex = Math.min(
+      Math.floor(progress / 25),
+      hints.length - 1
+    );
+    hintText.textContent = hints[hintIndex];
 
-  if (progress >= 100) clearInterval(interval);
-}, 200);
+    if (progress >= 100) clearInterval(interval);
+  }, 200);
+
+  loadingDiv._interval = interval;
+}
+
+// ---------- Генерация PDF ----------
 
 function generateLocalPDF() {
+  // Совместимость с UMD-сборкой jsPDF
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const t = TYPES[S.result];
