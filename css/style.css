@@ -137,3 +137,32 @@ body { color: var(--black) !important; font-family: 'Inter', -apple-system, sans
 .bottom {
   gap: 10px;
 }
+
+/* Стили для прогресс-бара на экране загрузки */
+.progress-outer {
+  width: 200px;
+  height: 4px;
+  background: var(--gray-light);
+  border-radius: 2px;
+  margin: 12px auto;
+  overflow: hidden;
+}
+.progress-inner {
+  height: 100%;
+  background: var(--black);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.loading-hint {
+  font-size: 13px;
+  color: var(--gray);
+  margin-top: 8px;
+}
+
+/* Увеличенные отступы для кнопок в футере */
+.bottom .btn + .btn {
+  margin-top: 10px;
+}
+.bottom {
+  gap: 10px;
+}

@@ -28,6 +28,68 @@ function closePolicyModal() {
   document.getElementById('policyModal').classList.remove('show');
 }
 
+// ---------- Работа с localStorage ----------
+
+function saveProgress() {
+  const data = {
+    qi: S.qi,
+    scores: S.scores,
+    answers: S.answers,
+    sel: S.sel
+  };
+  localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(data));
+}
+
+function loadProgress() {
+  const raw = localStorage.getItem(STORAGE_PROGRESS_KEY);
+  if (!raw) return false;
+  try {
+    const data = JSON.parse(raw);
+    S.qi = data.qi || 0;
+    S.scores = data.scores || {T1:0, T2:0, T3:0, T4:0, T5:0};
+    S.answers = data.answers || [];
+    S.sel = data.sel ?? null;
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function clearProgress() {
+  localStorage.removeItem(STORAGE_PROGRESS_KEY);
+}
+
+function saveResult() {
+  const data = {
+    result: S.result,
+    userName: S.userName,
+    date: new Date().toISOString()
+  };
+  localStorage.setItem(STORAGE_RESULT_KEY, JSON.stringify(data));
+  localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
+}
+
+function loadLastResult() {
+  const raw = localStorage.getItem(STORAGE_RESULT_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch(e) {
+    return null;
+  }
+}
+
+function canRetest() {
+  const lastDateStr = localStorage.getItem(STORAGE_DATE_KEY);
+  if (!lastDateStr) return { allowed: true, daysLeft: 0 };
+  const lastDate = new Date(lastDateStr);
+  const now = new Date();
+  const diffMs = now - lastDate;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const daysLeft = 30 - diffDays;
+  return { allowed: daysLeft <= 0, daysLeft: Math.max(0, daysLeft) };
+}
+
 // ---------- Хедер для квиза ----------
 
 function renderQuizHeader() {
@@ -80,6 +142,7 @@ function getLeadingType() {
 function getBodyElement(screen) {
   switch (screen) {
     case 'welcome': return bWelcome();
+    case 'science': return bScience();
     case 'prep':    return bPrep();
     case 'name':    return bName();
     case 'quiz':    return bQuiz();
@@ -136,6 +199,33 @@ function bWelcome() {
   return frag;
 }
 
+function bScience() {
+  const frag = document.createDocumentFragment();
+  const wrap = document.createElement('div');
+  wrap.className = 'name-screen';
+  wrap.innerHTML = `
+    <span class="prep-icon">🧬</span>
+    <h2 class="cormorant ns-title">Ваш тип кожи — не навсегда</h2>
+    <p class="ns-sub" style="text-align:left; font-size:13px; line-height:1.6;">
+      Согласно системе типирования кожи Бауманн (BSTI), тип кожи — это не статичный параметр, а динамическая характеристика, которая может меняться под влиянием множества факторов.
+    </p>
+    <div style="font-size:13px; line-height:1.6; color:var(--black); margin-bottom:16px;">
+      <b>Что влияет на изменение типа кожи:</b>
+      <ul style="padding-left:20px; margin-top:6px;">
+        <li>Возраст и гормональные изменения (беременность, менопауза)</li>
+        <li>Смена климата и сезонов</li>
+        <li>Уровень стресса</li>
+        <li>Питание и образ жизни</li>
+        <li>Приём лекарственных препаратов</li>
+      </ul>
+    </div>
+    <p class="ns-sub" style="text-align:left; font-size:13px; line-height:1.6;">
+      Доктор Лесли Бауманн рекомендует проходить типирование <b>ежегодно</b> или после значительных жизненных изменений, чтобы актуализировать протокол ухода и поддерживать кожу в оптимальном состоянии.
+    </p>`;
+  frag.appendChild(wrap);
+  return frag;
+}
+
 function bPrep() {
   const frag = document.createDocumentFragment();
   const wrap = document.createElement('div');
@@ -168,7 +258,7 @@ function bName() {
   input.className = 'input-field';
   input.type = 'text';
   input.placeholder = 'Например: Ирина';
-  input.value = S.userName;   // пустое после изменений в state
+  input.value = S.userName;
   input.maxLength = 30;
   input.addEventListener('input', () => {
     S.userName = input.value;
@@ -237,7 +327,10 @@ function bConsent() {
       <span class="consent-link" style="text-decoration:underline; cursor:pointer;">политикой обработки персональных данных</span>
     </p>
     <div id="cerr" class="err-hint${S.cerr ? ' show' : ''}">Необходимо согласие для продолжения</div>
-    <p style="font-size:10px; color:var(--gray); margin-top:4px;">* Обязательный вопрос</p>`;
+    <p style="font-size:10px; color:var(--gray); margin-top:4px;">* Обязательный вопрос</p>
+    <p style="font-size:11px; color:var(--gray); margin-top:12px; line-height:1.4;">
+      Пожалуйста, отвечайте честно — от этого зависит точность протокола. Повторное тестирование будет доступно через 30 дней.
+    </p>`;
 
   const cr = wrap.querySelector('#cr');
   const link = wrap.querySelector('.consent-link');
@@ -308,6 +401,7 @@ function bBooking() {
 function getFooterElement(screen) {
   switch (screen) {
     case 'welcome': return fWelcome();
+    case 'science': return fScience();
     case 'prep':    return fPrep();
     case 'name':    return fName();
     case 'quiz':    return fQuiz();
@@ -320,14 +414,27 @@ function getFooterElement(screen) {
 
 function fWelcome() {
   const container = document.createElement('div');
-  container.appendChild(createButton('Начать диагностику →', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); navigateTo('prep'); } }));
+  container.appendChild(createButton('Начать диагностику →', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); navigateTo('science'); } }));
+  const hint = document.createElement('p');
+  hint.style.fontSize = '10px';
+  hint.style.color = 'var(--gray)';
+  hint.style.textAlign = 'center';
+  hint.style.marginTop = '6px';
+  hint.textContent = 'Нажимая кнопку, Вы соглашаетесь на обработку персональных данных';
+  container.appendChild(hint);
+  return container;
+}
+
+function fScience() {
+  const container = document.createElement('div');
+  container.appendChild(createButton('Понятно, продолжаем →', { cls: 'btn-black', onClick: () => { triggerHaptic('light'); navigateTo('prep'); } }));
   return container;
 }
 
 function fPrep() {
   const container = document.createElement('div');
   container.appendChild(createButton('Я выполнил(а) условия →', { cls: 'btn-black', onClick: () => { triggerHaptic('light'); navigateTo('name'); } }));
-  container.appendChild(createButton('← Назад', { cls: 'btn-outline', onClick: () => { triggerHaptic('light'); navigateTo('welcome'); } }));
+  container.appendChild(createButton('← Назад', { cls: 'btn-outline', onClick: () => { triggerHaptic('light'); navigateTo('science'); } }));
   return container;
 }
 
@@ -341,7 +448,6 @@ function fName() {
 function fQuiz() {
   const container = document.createElement('div');
   container.appendChild(createButton('Далее →', { cls: 'btn-black', onClick: nextQ, disabled: S.sel === null }));
-  const backTarget = S.qi === 0 ? 'name' : null; // на первом вопросе назад к имени
   const backOnClick = S.qi === 0
     ? () => { triggerHaptic('light'); navigateTo('name'); }
     : () => prevQ();
@@ -357,13 +463,58 @@ function fConsent() {
 
 function fResult() {
   const container = document.createElement('div');
-  container.style.gap = '12px';
+  container.style.gap = '10px';
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
 
+  // PDF
   container.appendChild(createButton('📥 Скачать PDF на устройство', { cls: 'btn-gold', onClick: () => { triggerHaptic('medium'); generateLocalPDF(); } }));
+
+  // Поделиться
+  container.appendChild(createButton('🔗 Поделиться результатом', { cls: 'btn-outline-dark', onClick: () => {
+    triggerHaptic('medium');
+    const t = TYPES[S.result];
+    const text = `Мой тип кожи по Бауманну — ${t.emoji} ${t.name}. Пройди тест и узнай свой тип: https://t.me/AssistentMilovskayaBot`;
+    if (navigator.share) {
+      navigator.share({ title: 'Карта кожи', text: text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Ссылка скопирована в буфер обмена');
+      }).catch(() => {});
+    }
+  }}));
+
+  // Протокол в Telegram
   container.appendChild(createButton('📩 Получить протокол в Telegram', { cls: 'btn-outline-dark', onClick: () => { triggerHaptic('medium'); openBotLink('get_pdf_protocol'); } }));
+
+  // Запись
   container.appendChild(createButton('✍️ Записаться на диагностику к Ирине', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); navigateTo('booking'); } }));
+
+  // Кнопка повторного теста
+  const { allowed, daysLeft } = canRetest();
+  if (allowed) {
+    container.appendChild(createButton('🔄 Пройти тест заново', { cls: 'btn-outline', onClick: () => {
+      triggerHaptic('light');
+      clearProgress();
+      S.qi = 0;
+      S.scores = {T1:0, T2:0, T3:0, T4:0, T5:0};
+      S.answers = [];
+      S.sel = null;
+      S.result = null;
+      S.consent = false;
+      navigateTo('science');
+    }}));
+  } else {
+    const blockMsg = document.createElement('div');
+    blockMsg.style.fontSize = '12px';
+    blockMsg.style.color = 'var(--gray)';
+    blockMsg.style.textAlign = 'center';
+    blockMsg.style.lineHeight = '1.5';
+    blockMsg.style.marginTop = '8px';
+    blockMsg.innerHTML = `⏳ Следующее тестирование доступно через ${daysLeft} дн.<br>
+    Полный цикл обновления клеток эпидермиса составляет 28–30 дней. Однако для объективного изменения таких параметров, как работа сальных желез, чувствительность и барьерные функции кожи, требуется больше времени.`;
+    container.appendChild(blockMsg);
+  }
 
   return container;
 }
@@ -406,8 +557,10 @@ function nextQ() {
 
   if (S.qi < Q.length - 1) {
     S.qi++;
+    saveProgress();
     renderWithAnimation();
   } else {
+    clearProgress();
     navigateTo('consent');
   }
 }
@@ -423,6 +576,7 @@ function prevQ() {
 
   S.qi--;
   S.sel = lastSel;
+  saveProgress();
   renderWithAnimation();
 }
 
@@ -455,6 +609,7 @@ function calcResult() {
     if (v > max) { max = v; win = k; }
   }
   S.result = win;
+  saveResult();
   navigateTo('result');
 }
 
@@ -548,7 +703,6 @@ function generateLocalPDF() {
   doc.setTextColor(100);
   doc.text('Данный протокол носит информационный характер и не является медицинским диагнозом.', pageWidth / 2, y, { align: 'center' });
 
-  // Вместо прямого doc.save (может не работать в WebApp) создаём Blob и открываем ссылку
   const pdfBlob = doc.output('blob');
   const url = URL.createObjectURL(pdfBlob);
   const a = document.createElement('a');
