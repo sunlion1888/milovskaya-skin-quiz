@@ -166,3 +166,22 @@ body { color: var(--black) !important; font-family: 'Inter', -apple-system, sans
 .bottom {
   gap: 10px;
 }
+
+/* Toast уведомление */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--black);
+  color: white;
+  padding: 12px 24px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  z-index: 3000;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+.toast.fade-out {
+  opacity: 0;
+}

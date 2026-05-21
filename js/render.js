@@ -3,6 +3,10 @@ function clearElement(el) {
 }
 
 function render() {
+  // Очищаем таймер предыдущего экрана (если был)
+  if (contentEl.firstChild && contentEl.firstChild._timer) {
+    clearInterval(contentEl.firstChild._timer);
+  }
   if (contentEl.firstChild && contentEl.firstChild._interval) {
     clearInterval(contentEl.firstChild._interval);
   }
