@@ -396,19 +396,96 @@ function bResult() {
 }
 
 function bBooking() {
-  // Заглушка — будет доработана позже
   const frag = document.createDocumentFragment();
   const wrap = document.createElement('div');
   wrap.className = 'name-screen';
-  const h2 = document.createElement('h2');
-  h2.className = 'cormorant ns-title';
-  h2.textContent = 'Запись к Ирине';
-  wrap.appendChild(h2);
-  const p = document.createElement('p');
-  p.textContent = 'Здесь будет форма записи';
-  wrap.appendChild(p);
+  wrap.style.paddingTop = '24px';
+
+  // Фото
+  const photo = document.createElement('img');
+  photo.src = PHOTO_URL;
+  photo.alt = 'Ирина Миловская';
+  photo.style.width = '120px';
+  photo.style.height = '120px';
+  photo.style.borderRadius = '50%';
+  photo.style.objectFit = 'cover';
+  photo.style.display = 'block';
+  photo.style.margin = '0 auto 16px';
+  photo.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
+  wrap.appendChild(photo);
+
+  // Имя и специализация
+  const nameEl = document.createElement('h2');
+  nameEl.className = 'cormorant';
+  nameEl.style.fontSize = '24px';
+  nameEl.style.fontWeight = '600';
+  nameEl.style.textAlign = 'center';
+  nameEl.style.marginBottom = '4px';
+  nameEl.textContent = 'Ирина Миловская';
+  wrap.appendChild(nameEl);
+
+  const specEl = document.createElement('p');
+  specEl.style.fontSize = '13px';
+  specEl.style.color = 'var(--gray)';
+  specEl.style.textAlign = 'center';
+  specEl.style.marginBottom = '20px';
+  specEl.textContent = 'Врач-косметолог, дерматолог, главный врач FGF Medical';
+  wrap.appendChild(specEl);
+
+  // Адрес и время
+  const info = document.createElement('div');
+  info.style.background = 'var(--gray-light)';
+  info.style.borderRadius = 'var(--r)';
+  info.style.padding = '16px';
+  info.style.marginBottom = '20px';
+  info.style.fontSize = '13px';
+  info.style.lineHeight = '1.6';
+  info.innerHTML = `
+    <p style="margin-bottom:8px;"><b>📍 Адрес:</b><br>Санкт-Петербург, Малый пр. В.О., д. 64, корп. 1, стр. 1, помещение 100-Н<br>(ЖК The Residence, проход со стороны 24-й и 25-й линий В.О.)</p>
+    <p><b>🕒 Приём:</b> четверг, пятница, воскресенье<br>с 10:00 до 21:00</p>
+  `;
+  wrap.appendChild(info);
+
   frag.appendChild(wrap);
   return frag;
+}
+
+function fBooking() {
+  const container = document.createElement('div');
+
+  const btnClinic = createButton('Написать в клинику FGF Medical', {
+    cls: 'btn-black',
+    onClick: () => {
+      triggerHaptic('medium');
+      try {
+        tg.openTelegramLink('https://t.me/fgf_medical');
+      } catch(e) {
+        window.open('https://t.me/fgf_medical', '_blank');
+      }
+    }
+  });
+  container.appendChild(btnClinic);
+
+  const btnPersonal = createButton('Написать Ирине лично', {
+    cls: 'btn-outline-dark',
+    onClick: () => {
+      triggerHaptic('medium');
+      try {
+        tg.openTelegramLink('https://t.me/MilovskayaDR');
+      } catch(e) {
+        window.open('https://t.me/MilovskayaDR', '_blank');
+      }
+    }
+  });
+  container.appendChild(btnPersonal);
+
+  const backBtn = createButton('← Назад к протоколу', {
+    cls: 'btn-outline',
+    onClick: () => navigateTo('result')
+  });
+  container.appendChild(backBtn);
+
+  return container;
 }
 
 // ---------- Генераторы футера ----------
@@ -497,14 +574,23 @@ function fConsent() {
 function fResult() {
   const container = document.createElement('div');
 
-  const pdfBtn = createButton('📥 Скачать PDF-протокол (в бот)', {
+  const localPdfBtn = createButton('📥 Скачать PDF на устройство', {
     cls: 'btn-gold',
+    onClick: () => {
+      triggerHaptic('medium');
+      generateLocalPDF();
+    }
+  });
+  container.appendChild(localPdfBtn);
+
+  const botPdfBtn = createButton('📩 Получить протокол в Telegram', {
+    cls: 'btn-outline-dark',
     onClick: () => {
       triggerHaptic('medium');
       openBotLink('get_pdf_protocol');
     }
   });
-  container.appendChild(pdfBtn);
+  container.appendChild(botPdfBtn);
 
   const bookBtn = createButton('✍️ Записаться на диагностику к Ирине', {
     cls: 'btn-black',
@@ -516,16 +602,6 @@ function fResult() {
   bookBtn.style.marginTop = '2px';
   container.appendChild(bookBtn);
 
-  return container;
-}
-
-function fBooking() {
-  const container = document.createElement('div');
-  const backBtn = createButton('← Назад к протоколу', {
-    cls: 'btn-outline',
-    onClick: () => navigateTo('result')
-  });
-  container.appendChild(backBtn);
   return container;
 }
 
@@ -595,10 +671,153 @@ function renderLoadingScreen() {
 
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'loading-full';
-  loadingDiv.innerHTML = `
-    <img src="${LOGO_URL}" class="loading-logo" alt="Анализ...">
-    <div class="cormorant loading-title">Синтезирую протокол...</div>
-    <div style="font-size:13px; color:var(--gray)">Анализирую биомаркеры 🤍</div>
-  `;
+
+  // Фото вместо логотипа
+  const img = document.createElement('img');
+  img.src = PHOTO_URL;
+  img.className = 'loading-logo';
+  img.alt = 'Анализ...';
+  loadingDiv.appendChild(img);
+
+  const title = document.createElement('div');
+  title.className = 'cormorant loading-title';
+  title.textContent = 'Синтезирую протокол...';
+  loadingDiv.appendChild(title);
+
+  // Прогресс-бар
+  const progressOuter = document.createElement('div');
+  progressOuter.style.width = '200px';
+  progressOuter.style.height = '4px';
+  progressOuter.style.background = 'var(--gray-light)';
+  progressOuter.style.borderRadius = '2px';
+  progressOuter.style.margin = '12px auto';
+  progressOuter.style.overflow = 'hidden';
+
+  const progressInner = document.createElement('div');
+  progressInner.style.width = '0%';
+  progressInner.style.height = '100%';
+  progressInner.style.background = 'var(--black)';
+  progressInner.style.borderRadius = '2px';
+  progressInner.style.transition = 'width 0.3s ease';
+  progressOuter.appendChild(progressInner);
+  loadingDiv.appendChild(progressOuter);
+
+  // Подсказки
+  const hints = [
+    'Анализирую ответы...',
+    'Подбираю процедуры...',
+    'Формирую лабораторный чек-ап...',
+    'Собираю нутрицевтики 🤍'
+  ];
+  const hintText = document.createElement('div');
+  hintText.style.fontSize = '13px';
+  hintText.style.color = 'var(--gray)';
+  hintText.style.marginTop = '8px';
+  hintText.textContent = hints[0];
+  loadingDiv.appendChild(hintText);
+
   contentEl.appendChild(loadingDiv);
+
+  // Анимация прогресса и смена подсказок
+  let progress = 0;
+  const totalTime = 2200; // совпадает с setTimeout в submitConsent
+  const stepTime = totalTime / hints.length;
+
+  const interval = setInterval(() => {
+    progress += 100 / (totalTime / 200); // шаг каждые 200 мс
+    if (progress > 100) progress = 100;
+    progressInner.style.width = progress + '%';
+
+    const hintIndex = Math.min(
+      Math.floor(progress / (100 / hints.length)),
+      hints.length - 1
+    );
+    hintText.textContent = hints[hintIndex];
+  }, 200);
+
+  // Очистка интервала при уходе с экрана загрузки (на всякий случай)
+  loadingDiv._interval = interval;
+}
+
+function generateLocalPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const t = TYPES[S.result];
+  if (!t) return;
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let y = 15;
+
+  // Заголовок
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('Карта кожи — Персональный протокол', pageWidth / 2, y, { align: 'center' });
+  y += 8;
+
+  // Имя пользователя
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Пациент: ${S.userName || 'Не указано'}`, 15, y);
+  y += 6;
+
+  // Тип кожи
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text(`Тип: ${t.emoji} ${t.name}`, 15, y);
+  y += 8;
+
+  // Описание
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const descLines = doc.splitTextToSize(t.desc, pageWidth - 30);
+  doc.text(descLines, 15, y);
+  y += descLines.length * 5 + 4;
+
+  // Процедуры
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Рекомендованные процедуры:', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  t.procs.forEach(p => {
+    doc.text(`• ${p}`, 20, y);
+    y += 5;
+  });
+  y += 4;
+
+  // Check-Up
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Лабораторный Check-Up:', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  t.tests.forEach(c => {
+    doc.text(`• ${c}`, 20, y);
+    y += 5;
+  });
+  y += 4;
+
+  // Нутрицевтики
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Нутрицевтическая поддержка:', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  t.nutri.forEach(n => {
+    doc.text(`• ${n}`, 20, y);
+    y += 5;
+  });
+  y += 6;
+
+  // Дисклеймер
+  doc.setFontSize(8);
+  doc.setTextColor(100);
+  doc.text('Данный протокол носит информационный характер и не является медицинским диагнозом.', pageWidth / 2, y, { align: 'center' });
+
+  // Сохранение
+  const fileName = `Протокол_${S.userName || 'пациент'}_${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(fileName);
 }

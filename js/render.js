@@ -12,6 +12,11 @@ function clearElement(el) {
  * Обновляет header, content и footer в зависимости от текущего S.screen.
  */
 function render() {
+  // Сначала очищаем интервал с экрана загрузки, если он был запущен
+  if (contentEl.firstChild && contentEl.firstChild._interval) {
+    clearInterval(contentEl.firstChild._interval);
+  }
+
   clearElement(headerEl);
   clearElement(contentEl);
   clearElement(footerEl);
@@ -49,4 +54,13 @@ function render() {
 function navigateTo(screen) {
   S.screen = screen;
   render();
+}
+
+function postRender() {
+  if (S.screen === 'name') {
+    setTimeout(() => {
+      const input = document.getElementById('nameInput');
+      if (input) input.focus();
+    }, 100);
+  }
 }
