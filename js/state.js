@@ -5,7 +5,7 @@ const LOGO_URL   = 'https://raw.githubusercontent.com/sunlion1888/milovskaya-ski
 
 let S = {
   screen: 'welcome',
-  userName: '',
+  userName: tg.initDataUnsafe?.user?.first_name || '',
   qi: 0,
   scores: {T1:0, T2:0, T3:0, T4:0, T5:0},
   answers: [],
@@ -13,7 +13,8 @@ let S = {
   result: null,
   consent: false,
   cerr: false,
-  nerr: false
+  nerr: false,
+  direction: 'forward' // 'forward' | 'backward'
 };
 
-let TOTAL_STEPS = 12; // будет переопределено после загрузки quizData
+let TOTAL_STEPS = 12;
