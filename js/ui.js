@@ -671,7 +671,7 @@ function renderLoadingScreen() {
   loadingDiv._interval = interval;
 }
 
-// ---------- Генерация PDF ----------
+// ---------- Генерация PDF (datauristring) ----------
 function generateLocalPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -727,15 +727,8 @@ function generateLocalPDF() {
   doc.text('Данный протокол носит информационный характер и не является медицинским диагнозом.', pageWidth / 2, y, { align: 'center' });
 
   try {
-    const pdfBlob = doc.output('blob');
-    const url = URL.createObjectURL(pdfBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Протокол_${S.userName || 'пациент'}_${new Date().toISOString().slice(0,10)}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const pdfBase64 = doc.output('datauristring');
+    window.open(pdfBase64, '_blank');
   } catch(e) {
     showToast('❌ Не удалось создать PDF. Нажмите и удерживайте кнопку «Скачать PDF» и выберите «Открыть в браузере»');
   }
