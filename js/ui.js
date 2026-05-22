@@ -91,10 +91,13 @@ function canRetest() {
 // ---------- Хедер для квиза ----------
 function renderQuizHeader() {
   const pct = Math.round(((S.qi + 1) / Q.length) * 100);
+
   const bar = document.createElement('div');
   bar.className = 'top-bar';
+
   const pbOuter = document.createElement('div');
   pbOuter.className = 'pb-outer';
+
   const pbInner = document.createElement('div');
   pbInner.className = 'pb-inner';
   pbInner.style.width = pct + '%';
@@ -109,12 +112,16 @@ function renderQuizHeader() {
       pbInner.appendChild(emoji);
     }
   }
+
   pbOuter.appendChild(pbInner);
+
   const stepTxt = document.createElement('div');
   stepTxt.className = 'step-txt';
   stepTxt.textContent = `${S.qi + 1} / ${Q.length}`;
+
   bar.appendChild(pbOuter);
   bar.appendChild(stepTxt);
+
   headerEl.appendChild(bar);
 }
 
@@ -145,6 +152,7 @@ function getBodyElement(screen) {
 
 function bWelcome() {
   const frag = document.createDocumentFragment();
+
   const logoWrap = document.createElement('div');
   logoWrap.className = 'logo-wrap';
   const img = document.createElement('img');
@@ -184,6 +192,7 @@ function bWelcome() {
   disclaimer.style.marginTop = '8px';
   disclaimer.textContent = '⚠️ Квиз — авторский образовательный инструмент. Результат носит ознакомительный характер и не является медицинским диагнозом.';
   frag.appendChild(disclaimer);
+
   return frag;
 }
 
@@ -254,13 +263,17 @@ function bName() {
     const nerrEl = document.getElementById('nerr');
     if (nerrEl) nerrEl.classList.remove('show');
   });
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitName(); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitName();
+  });
   wrap.appendChild(input);
+
   const nerr = document.createElement('div');
   nerr.id = 'nerr';
   nerr.className = 'err-hint' + (S.nerr ? ' show' : '');
   nerr.textContent = 'Пожалуйста, введите имя (от 2 букв)';
   wrap.appendChild(nerr);
+
   frag.appendChild(wrap);
   return frag;
 }
@@ -268,20 +281,28 @@ function bName() {
 function bQuiz() {
   const frag = document.createDocumentFragment();
   const q = Q[S.qi];
+
   const card = document.createElement('div');
   card.className = 'q-card';
   card.innerHTML = `<h2 class="cormorant q-title">${q.title}</h2>${q.hint ? `<p class="q-hint">${q.hint}</p>` : ''}`;
   frag.appendChild(card);
+
   const optsContainer = document.createElement('div');
   optsContainer.className = 'opts';
+
   q.opts.forEach((o, i) => {
     const opt = document.createElement('div');
     opt.className = 'opt' + (S.sel === i ? ' sel' : '');
     opt.dataset.i = i;
     opt.innerHTML = `<div class="opt-dot"></div><span>${o.t}</span>`;
-    opt.addEventListener('click', () => { triggerHaptic('light'); S.sel = i; render(); });
+    opt.addEventListener('click', () => {
+      triggerHaptic('light');
+      S.sel = i;
+      render();
+    });
     optsContainer.appendChild(opt);
   });
+
   frag.appendChild(optsContainer);
   return frag;
 }
@@ -311,7 +332,13 @@ function bConsent() {
     e.stopPropagation();
     document.getElementById('policyModal').classList.add('show');
   });
-  cr.addEventListener('click', () => { triggerHaptic('light'); S.consent = !S.consent; S.cerr = false; render(); });
+  cr.addEventListener('click', () => {
+    triggerHaptic('light');
+    S.consent = !S.consent;
+    S.cerr = false;
+    render();
+  });
+
   frag.appendChild(wrap);
   return frag;
 }
@@ -319,6 +346,7 @@ function bConsent() {
 function bResult() {
   const t = TYPES[S.result];
   if (!t) return document.createDocumentFragment();
+
   const wrapper = document.createElement('div');
   wrapper.style.padding = '24px 0 40px';
   wrapper.innerHTML = `
@@ -341,6 +369,7 @@ function bResult() {
       <div style="margin-top: 8px;">${t.nutri.map(n => `<span class="nutri-tag">${n}</span>`).join('')}</div>
     </div>
     <div class="fine-print">Данный протокол носит информационный характер и требует клинического подтверждения на очной консультации врача-косметолога.</div>`;
+
   return wrapper;
 }
 
@@ -367,14 +396,17 @@ function bRetestBlock() {
   const wrap = document.createElement('div');
   wrap.style.padding = '24px 16px';
   wrap.style.textAlign = 'center';
+
   const icon = document.createElement('span');
   icon.style.fontSize = '48px';
   icon.textContent = '⏳';
   wrap.appendChild(icon);
+
   const h2 = document.createElement('h2');
   h2.className = 'cormorant ns-title';
   h2.textContent = 'Тест временно недоступен';
   wrap.appendChild(h2);
+
   const countdown = document.createElement('div');
   countdown.style.fontSize = '16px';
   countdown.style.fontWeight = '600';
@@ -406,6 +438,7 @@ function bRetestBlock() {
   desc.style.lineHeight = '1.5';
   desc.innerHTML = 'Полный цикл обновления клеток эпидермиса составляет 28–30 дней. Однако для объективного изменения таких параметров, как работа сальных желез, чувствительность и барьерные функции кожи, требуется больше времени.';
   wrap.appendChild(desc);
+
   frag.appendChild(wrap);
   return frag;
 }
@@ -483,21 +516,6 @@ function fResult() {
 
   container.appendChild(createButton('📥 Скачать PDF на устройство', { cls: 'btn-gold', onClick: () => { triggerHaptic('medium'); generateLocalPDF(); } }));
 
-  container.appendChild(createButton('🔗 Поделиться результатом', { cls: 'btn-outline-dark', onClick: () => {
-    triggerHaptic('medium');
-    const t = TYPES[S.result];
-    const text = `Мой тип кожи по Бауманну — ${t.emoji} ${t.name}. Пройди тест: https://t.me/AssistentMilovskayaBot`;
-    if (navigator.share) {
-      navigator.share({ title: 'Карта кожи', text: text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        showToast('✅ Ссылка скопирована в буфер обмена');
-      }).catch(() => { showToast('❌ Не удалось скопировать ссылку'); });
-    }
-  }}));
-
-  container.appendChild(createButton('📩 Получить протокол в Telegram', { cls: 'btn-outline-dark', onClick: () => { triggerHaptic('medium'); openBotLink('get_pdf_protocol'); } }));
-
   container.appendChild(createButton('✍️ Записаться на диагностику к Ирине', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); navigateTo('booking'); } }));
 
   container.appendChild(createButton('🔄 Пройти тест заново', { cls: 'btn-outline', onClick: () => {
@@ -525,9 +543,11 @@ function fBooking() {
   container.style.gap = '10px';
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
+
   container.appendChild(createButton('Написать Ирине лично', { cls: 'btn-black', onClick: () => { triggerHaptic('medium'); try { tg.openTelegramLink('https://t.me/MilovskayaDR'); } catch(e) { window.open('https://t.me/MilovskayaDR', '_blank'); } } }));
   container.appendChild(createButton('Написать администратору', { cls: 'btn-outline-dark', onClick: () => { triggerHaptic('medium'); try { tg.openTelegramLink('https://t.me/fgf_medical'); } catch(e) { window.open('https://t.me/fgf_medical', '_blank'); } } }));
   container.appendChild(createButton('← Назад к протоколу', { cls: 'btn-outline', onClick: () => navigateTo('result') }));
+
   return container;
 }
 
@@ -540,7 +560,12 @@ function fRetestBlock() {
 // ---------- Логика навигации и расчёта ----------
 function submitName() {
   const name = S.userName.trim();
-  if (name.length < 2) { S.nerr = true; render(); triggerHaptic('warning'); return; }
+  if (name.length < 2) {
+    S.nerr = true;
+    render();
+    triggerHaptic('warning');
+    return;
+  }
   triggerHaptic('medium');
   navigateTo('quiz');
 }
@@ -553,17 +578,26 @@ function nextQ() {
   for (const [k, v] of Object.entries(o.s)) S.scores[k] += v;
   S.answers.push(S.sel);
   S.sel = null;
-  if (S.qi < Q.length - 1) { S.qi++; saveProgress(); renderWithAnimation(); }
-  else { clearProgress(); navigateTo('consent'); }
+
+  if (S.qi < Q.length - 1) {
+    S.qi++;
+    saveProgress();
+    renderWithAnimation();
+  } else {
+    clearProgress();
+    navigateTo('consent');
+  }
 }
 
 function prevQ() {
   if (S.qi === 0) return;
   triggerHaptic('light');
   S.direction = 'backward';
+
   const lastSel = S.answers.pop();
   const o = Q[S.qi - 1].opts[lastSel];
   for (const [k, v] of Object.entries(o.s)) S.scores[k] -= v;
+
   S.qi--;
   S.sel = lastSel;
   saveProgress();
@@ -573,11 +607,20 @@ function prevQ() {
 function renderWithAnimation() {
   const animClass = S.direction === 'forward' ? 'animate-forward' : 'animate-backward';
   contentEl.classList.add(animClass);
-  setTimeout(() => { contentEl.classList.remove(animClass); render(); }, 300);
+
+  setTimeout(() => {
+    contentEl.classList.remove(animClass);
+    render();
+  }, 300);
 }
 
 function submitConsent() {
-  if (!S.consent) { S.cerr = true; render(); triggerHaptic('warning'); return; }
+  if (!S.consent) {
+    S.cerr = true;
+    render();
+    triggerHaptic('warning');
+    return;
+  }
   triggerHaptic('success');
   S.screen = 'loading';
   render();
@@ -586,9 +629,12 @@ function submitConsent() {
 
 function calcResult() {
   let max = -1, win = 'T5';
-  for (const [k, v] of Object.entries(S.scores)) { if (v > max) { max = v; win = k; } }
+  for (const [k, v] of Object.entries(S.scores)) {
+    if (v > max) { max = v; win = k; }
+  }
   S.result = win;
   saveResult();
+  sendToGoogleSheet();
   navigateTo('result');
 }
 
@@ -597,6 +643,7 @@ function renderLoadingScreen() {
   clearElement(headerEl);
   clearElement(contentEl);
   clearElement(footerEl);
+
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'loading-full';
   loadingDiv.innerHTML = `
@@ -604,10 +651,13 @@ function renderLoadingScreen() {
     <div class="cormorant loading-title">Синтезирую протокол...</div>
     <div class="progress-outer"><div class="progress-inner" style="width:0%"></div></div>
     <div class="loading-hint">Анализирую ответы...</div>`;
+
   const progressInner = loadingDiv.querySelector('.progress-inner');
   const hintText = loadingDiv.querySelector('.loading-hint');
   const hints = ['Анализирую ответы...', 'Подбираю процедуры...', 'Формирую лабораторный чек-ап...', 'Собираю нутрицевтики 🤍'];
+  
   contentEl.appendChild(loadingDiv);
+
   let progress = 0;
   const interval = setInterval(() => {
     progress += 100 / (2200 / 200);
@@ -617,6 +667,7 @@ function renderLoadingScreen() {
     hintText.textContent = hints[hintIndex];
     if (progress >= 100) clearInterval(interval);
   }, 200);
+
   loadingDiv._interval = interval;
 }
 
@@ -626,8 +677,10 @@ function generateLocalPDF() {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const t = TYPES[S.result];
   if (!t) return;
+
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 15;
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
   doc.text('Карта кожи — Персональный протокол', pageWidth / 2, y, { align: 'center' });
@@ -645,29 +698,62 @@ function generateLocalPDF() {
   const descLines = doc.splitTextToSize(t.desc, pageWidth - 30);
   doc.text(descLines, 15, y);
   y += descLines.length * 5 + 4;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
-  doc.text('Рекомендованные процедуры:', 15, y); y += 6;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Рекомендованные процедуры:', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
   t.procs.forEach(p => { doc.text(`• ${p}`, 20, y); y += 5; });
   y += 4;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
-  doc.text('Лабораторный Check-Up:', 15, y); y += 6;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Лабораторный Check-Up:', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
   t.tests.forEach(c => { doc.text(`• ${c}`, 20, y); y += 5; });
   y += 4;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
-  doc.text('Нутрицевтическая поддержка:', 15, y); y += 6;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Нутрицевтическая поддержка:', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
   t.nutri.forEach(n => { doc.text(`• ${n}`, 20, y); y += 5; });
   y += 6;
-  doc.setFontSize(8); doc.setTextColor(100);
+  doc.setFontSize(8);
+  doc.setTextColor(100);
   doc.text('Данный протокол носит информационный характер и не является медицинским диагнозом.', pageWidth / 2, y, { align: 'center' });
+
   try {
     const pdfBlob = doc.output('blob');
     const url = URL.createObjectURL(pdfBlob);
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Протокол_${S.userName || 'пациент'}_${new Date().toISOString().slice(0,10)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   } catch(e) {
-    showToast('❌ Не удалось создать PDF. Попробуйте получить протокол в Telegram.');
+    showToast('❌ Не удалось создать PDF. Нажмите и удерживайте кнопку «Скачать PDF» и выберите «Открыть в браузере»');
   }
+}
+
+// ---------- Отправка в Google Таблицу ----------
+function sendToGoogleSheet() {
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === 'ТВОЙ_URL_СКРИПТА') return;
+  const payload = {
+    date: new Date().toISOString(),
+    name: S.userName || 'Аноним',
+    type: S.result,
+    scores: S.scores,
+    answers: S.answers
+  };
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json' }
+  }).catch(() => {});
 }

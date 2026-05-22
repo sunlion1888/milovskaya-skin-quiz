@@ -9,6 +9,9 @@ const ADMIN_IDS = [
   455906678    // @MilovskayaDR
 ];
 
+// URL Google Apps Script для записи в таблицу
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKdJyd0oFGw4AIM6YUmDdqOPq4wJ6pq4PPdAs80l4uuW0D3MIkx1bBQqM1xAiEJvrf6Q/exec';
+
 // Ключи localStorage с привязкой к пользователю
 const STORAGE_PREFIX = 'skin_quiz_' + (tg.initDataUnsafe?.user?.id || 'anonymous') + '_';
 const STORAGE_PROGRESS_KEY = STORAGE_PREFIX + 'progress';
